@@ -49,9 +49,9 @@ public class PkRSS {
 	private final OkHttpClient httpClient = new OkHttpClient();
 	private final String httpCacheDir = "/okhttp";
 	private final int httpCacheSize = 1024 * 1024;
-	private final int httpCacheMaxAge = 60 * 60;
+	private final int httpCacheMaxAge = 2 * 60 * 60;
 	private final long httpConnectTimeout = 15;
-	private final long httpReadTimeout = 30;
+	private final long httpReadTimeout = 45;
 
 	// Reusable XML Parser
 	private final RSSParser rssParser = new RSSParser(this);
@@ -66,7 +66,7 @@ public class PkRSS {
 	private final SparseBooleanArray readList = new SparseBooleanArray();
 
 	// Database storing all articles marked as favorite
-	private final FavoriteDatabase favoriteDatabase; // TODO
+	private final FavoriteDatabase favoriteDatabase;
 
 	public static PkRSS with(Context context) {
 		if(singleton == null)
@@ -106,7 +106,8 @@ public class PkRSS {
 		return new RequestCreator(this, url);
 	}
 
-	protected void load(String url, String search, boolean individual, boolean skipCache, int page, Callback callback) {
+	protected void load(String url, String search, boolean individual, boolean skipCache, int page, Callback callback)
+		throws IOException {
 		// Can't load empty URLs, do nothing
 		if(url == null || url.isEmpty()) {
 			log("Invalid URL!", Log.ERROR);
@@ -118,6 +119,10 @@ public class PkRSS {
 			log("Favorites URL detected, skipping load...");
 			return;
 		}
+
+		// Call the callback, if available
+		if(callback != null)
+			callback.OnPreLoad();
 
 		// Start tracking load time
 		long time = System.currentTimeMillis();
@@ -162,6 +167,7 @@ public class PkRSS {
 		catch (Exception e) {
 			log("Error executing/reading http request!", Log.ERROR);
 			e.printStackTrace();
+			throw new IOException(e.getMessage());
 		}
 
 		// Create InputStream from response
@@ -173,7 +179,7 @@ public class PkRSS {
 
 		// Call the callback, if available
 		if(callback != null)
-			callback.postParse(newArticles);
+			callback.OnLoaded(newArticles);
 	}
 
 	public Map<String, List<Article>> get() {
@@ -416,9 +422,5 @@ public class PkRSS {
 				Log.wtf(tag, message);
 				break;
 		}
-	}
-
-	public interface Callback {
-		public void postParse(List<Article> articleList);
 	}
 }

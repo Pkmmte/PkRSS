@@ -1,6 +1,8 @@
 package com.pkmmte.pkrss;
 
 import android.os.AsyncTask;
+import android.util.Log;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -100,7 +102,7 @@ public class RequestCreator {
 	 * @param callback
 	 * @return
 	 */
-	public RequestCreator callback(PkRSS.Callback callback) {
+	public RequestCreator callback(Callback callback) {
 		this.data.callback(callback);
 		return this;
 	}
@@ -115,7 +117,7 @@ public class RequestCreator {
 	 *
 	 * @return
 	 */
-	public List<Article> get() {
+	public List<Article> get() throws IOException {
 		final Request request = data.build();
 		singleton.load(request.url, request.search, request.individual, request.skipCache, request.page, request.callback);
 		return singleton.get(request.individual ? request.url + "feed/?withoutcomments=1" : request.url, request.search);
@@ -124,15 +126,21 @@ public class RequestCreator {
 	/**
 	 * Executes request and returns the first Article associated
 	 * with this request. This is useful for individual Article requests.
+	 * <br>
+	 * May return null.
 	 *
 	 * @return
 	 */
 	public Article getFirst() {
-		List<Article> articleList = get();
-		if(articleList == null || articleList.size() < 1)
-			return null;
+		try {
+			List<Article> articleList = get();
+			if(articleList == null || articleList.size() < 1)
+				return null;
 
-		return articleList.get(0);
+			return articleList.get(0);
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 	/**
@@ -147,7 +155,13 @@ public class RequestCreator {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				singleton.load(request.url, request.search, request.individual, request.skipCache, request.page, request.callback);
+				try {
+					singleton.load(request.url, request.search, request.individual, request.skipCache, request.page, request.callback);
+				} catch (IOException e) {
+					singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
+					if(request.callback != null)
+						request.callback.OnLoadFailed();
+				}
 				return null;
 			}
 		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);

@@ -11,9 +11,9 @@ public final class Request {
 	public final boolean individual;
 	public final boolean skipCache;
 	public final int page;
-	public final PkRSS.Callback callback;
+	public final Callback callback;
 
-	public Request(String url, String search, boolean individual, boolean skipCache, int page, PkRSS.Callback callback) {
+	public Request(String url, String search, boolean individual, boolean skipCache, int page, Callback callback) {
 		this.tag = String.valueOf(ID_GENERATOR.incrementAndGet());
 		this.url = url;
 		this.search = search;
@@ -40,7 +40,7 @@ public final class Request {
 		private boolean individual;
 		private boolean skipCache;
 		private int page;
-		private PkRSS.Callback callback;
+		private Callback callback;
 
 		public Builder(String url) {
 			this.tag = null;
@@ -82,7 +82,7 @@ public final class Request {
 			return this;
 		}
 
-		public Builder callback(PkRSS.Callback callback) {
+		public Builder callback(Callback callback) {
 			this.callback = callback;
 			return this;
 		}

@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.pkmmte.pkrss</groupId>
   <artifactId>pkrss</artifactId>
-  <version>1.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>aar</packaging>
   <name>PkRSS</name>
   <description>An RSS feed manager for Android</description>
