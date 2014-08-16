@@ -18,9 +18,7 @@ public class RequestCreator {
 	/**
 	 * Assigns a reference tag to this request.
 	 * Leaving this empty will automatically generate a tag.
-	 *
 	 * @param tag
-	 * @return
 	 */
 	public RequestCreator tag(String tag) {
 		this.data.tag(tag);
@@ -30,9 +28,7 @@ public class RequestCreator {
 	/**
 	 * Looks up a specific query on the RSS feed.
 	 * The query string is automatically encoded.
-	 *
 	 * @param search
-	 * @return
 	 */
 	public RequestCreator search(String search) {
 		this.data.search(search);
@@ -43,8 +39,6 @@ public class RequestCreator {
 	 * Threats this request as an individual article,
 	 * rather than full feed. Use only if you are sure that
 	 * the load URL belongs to a single article.
-	 *
-	 * @return
 	 */
 	public RequestCreator individual() {
 		this.data.individual(true);
@@ -54,8 +48,6 @@ public class RequestCreator {
 	/**
 	 * Ignores already cached responses when making this
 	 * request. Useful for refreshing feeds/articles.
-	 *
-	 * @return
 	 */
 	public RequestCreator skipCache() {
 		this.data.skipCache(true);
@@ -64,9 +56,7 @@ public class RequestCreator {
 
 	/**
 	 * Loads a specific page of the RSS feed.
-	 *
 	 * @param page
-	 * @return
 	 */
 	public RequestCreator page(int page) {
 		this.data.page(page);
@@ -77,8 +67,6 @@ public class RequestCreator {
 	 * Loads the next page of the current RSS feed.
 	 * If no page was previously loaded, this will
 	 * request the first page.
-	 *
-	 * @return
 	 */
 	public RequestCreator nextPage() {
 		Request request = data.build();
@@ -98,9 +86,7 @@ public class RequestCreator {
 
 	/**
 	 * Adds a callback listener to this request.
-	 *
-	 * @param callback
-	 * @return
+	 * @param callback Callback interface to respond to.
 	 */
 	public RequestCreator callback(Callback callback) {
 		this.data.callback(callback);
@@ -109,27 +95,25 @@ public class RequestCreator {
 
 	/**
 	 * Executes request and returns a full list containing all
-	 * articles loaded from this request's URL. <br>
-	 *
+	 * articles loaded from this request's URL.
+	 * <p>
 	 * If this request is marked as individual, the list will
 	 * contain only 1 index. It is recommended to use getFirst()
 	 * for individual requests instead.
-	 *
-	 * @return
 	 */
 	public List<Article> get() throws IOException {
 		final Request request = data.build();
-		singleton.load(request.url, request.search, request.individual, request.skipCache, request.page, request.callback);
+		singleton.load(request);
 		return singleton.get(request.individual ? request.url + "feed/?withoutcomments=1" : request.url, request.search);
 	}
 
 	/**
 	 * Executes request and returns the first Article associated
 	 * with this request. This is useful for individual Article requests.
-	 * <br>
+	 * <p>
 	 * May return null.
 	 *
-	 * @return
+	 * @return Returns the first article associated with this request.
 	 */
 	public Article getFirst() {
 		try {
@@ -144,8 +128,8 @@ public class RequestCreator {
 	}
 
 	/**
-	 * Executes request asynchronously. <br>
-	 *
+	 * Executes request asynchronously.
+	 * <p>
 	 * Be sure to add a callback to handle this.
 	 */
 	public void async() {
@@ -156,7 +140,7 @@ public class RequestCreator {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					singleton.load(request.url, request.search, request.individual, request.skipCache, request.page, request.callback);
+					singleton.load(request);
 				} catch (IOException e) {
 					singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
 					if(request.callback != null)

@@ -1,9 +1,12 @@
-package com.pkmmte.pkrss;
+package com.pkmmte.pkrss.parser;
 
 import android.util.Log;
+import com.pkmmte.pkrss.Article;
+import com.pkmmte.pkrss.PkRSS;
 import java.util.List;
 
 public abstract class Parser {
+	// For logging purposes
 	final String TAG = "Parser";
 	PkRSS singleton;
 
@@ -35,7 +38,29 @@ public abstract class Parser {
 	}
 
 	final void log(String tag, String message, int type) {
-		if(singleton != null)
-			singleton.log(tag, message, type);
+		if(singleton == null || !singleton.isLoggingEnabled())
+			return;
+
+		switch(type) {
+			case Log.VERBOSE:
+				Log.v(tag, message);
+				break;
+			case Log.DEBUG:
+				Log.d(tag, message);
+				break;
+			case Log.INFO:
+				Log.i(tag, message);
+				break;
+			case Log.WARN:
+				Log.w(tag, message);
+				break;
+			case Log.ERROR:
+				Log.e(tag, message);
+				break;
+			case Log.ASSERT:
+			default:
+				Log.wtf(tag, message);
+				break;
+		}
 	}
 }

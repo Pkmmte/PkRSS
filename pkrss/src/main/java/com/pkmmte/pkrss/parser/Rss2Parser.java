@@ -1,8 +1,10 @@
-package com.pkmmte.pkrss;
+package com.pkmmte.pkrss.parser;
 
 import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
+import com.pkmmte.pkrss.Article;
+import com.pkmmte.pkrss.PkRSS;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

@@ -6,9 +6,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import com.pkmmte.pkrss.downloader.Downloader;
+import com.pkmmte.pkrss.downloader.OkHttpDownloader;
+import com.pkmmte.pkrss.parser.Parser;
+import com.pkmmte.pkrss.parser.Rss2Parser;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +47,7 @@ public class PkRSS {
 	private final SharedPreferences mPrefs;
 
 	// Our handy client for getting XML feed data
+	private final Downloader downloader;
 	private final OkHttpClient httpClient = new OkHttpClient();
 	private final String httpCacheDir = "/okhttp";
 	private final int httpCacheSize = 1024 * 1024;
@@ -91,10 +95,13 @@ public class PkRSS {
 		return singleton;
 	}
 
-	PkRSS(Context context, Parser parser) {
+	PkRSS(Context context, Downloader downloader, Parser parser, boolean loggingEnabled) {
 		this.mContext = context;
+		this.downloader = downloader;
+		this.downloader.attachInstance(this);
 		this.parser = parser;
 		this.parser.attachInstance(this);
+		this.loggingEnabled = loggingEnabled;
 		this.mPrefs = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
 		getRead();
 		try {
@@ -127,77 +134,33 @@ public class PkRSS {
 		return new RequestCreator(this, url);
 	}
 
-	protected void load(String url, String search, boolean individual, boolean skipCache, int page, Callback callback)
-		throws IOException {
-		// Can't load empty URLs, do nothing
-		if(url == null || url.isEmpty()) {
-			log("Invalid URL!", Log.ERROR);
-			return;
-		}
-
+	protected void load(final Request request) throws IOException {
 		// Don't load if URL is the favorites key
-		if(url.equals(KEY_FAVORITES)) {
+		if(request.url.equals(KEY_FAVORITES)) {
 			log("Favorites URL detected, skipping load...");
 			return;
 		}
 
 		// Call the callback, if available
-		if(callback != null)
-			callback.OnPreLoad();
-
-		// Start tracking load time
-		long time = System.currentTimeMillis();
-
-		if(individual) // Append feed URL if individual article
-			url += "feed/?withoutcomments=1";
-		else if(search != null) // Append search query if available and not individual
-			url += "?s=" + Uri.encode(search);
+		if(request.callback != null)
+			request.callback.OnPreLoad();
 
 		// Create a copy for pagination & handle cache
-		String requestUrl = url;
-		int maxCacheAge = skipCache ? 0 : httpCacheMaxAge;
+		String safeUrl = downloader.toSafeUrl(request);
 
 		// Put the page index into the request's HashMap
-		pageTracker.put(requestUrl, page);
+		pageTracker.put(safeUrl, request.page);
 
-		// Unless the request is individual or page index is invalid, build proper URL page parameters
-		if(page > 1 && !individual)
-			requestUrl += (search == null ? "?paged=" : "&paged=") + String.valueOf(page);
-
-		// Build the OkHttp request
-		Request request = new Request.Builder()
-			.addHeader("Cache-Control", "public, max-age=" + maxCacheAge)
-			.url(requestUrl)
-			.build();
-
-		// Empty response string placeholder
-		String responseStr = null;
-
-		try {
-			// Execute the built request and log its data
-			log("Making a request to " + requestUrl + (skipCache ? " [SKIP-CACHE]" : " [MAX-AGE " + maxCacheAge + "]"));
-			Response response = httpClient.newCall(request).execute();
-
-			if(response.cacheResponse() != null)
-				log("Response retrieved from cache");
-
-			// Convert response body to a string
-			responseStr = response.body().string();
-			log("Request took " + (System.currentTimeMillis() - time) + "ms");
-		}
-		catch (Exception e) {
-			log("Error executing/reading http request!", Log.ERROR);
-			e.printStackTrace();
-			throw new IOException(e.getMessage());
-		}
+		// Get response from this request
+		String response = downloader.execute(request);
 
 		// Parse articles from response and inset into global list
-		List<Article> newArticles = parser.parse(responseStr);
-		insert(url, newArticles);
+		List<Article> newArticles = parser.parse(response);
+		insert(safeUrl, newArticles);
 
 		// Call the callback, if available
-		if(callback != null)
-			callback.OnLoaded(newArticles);
+		if(request.callback != null)
+			request.callback.OnLoaded(newArticles);
 	}
 
 	public Map<String, List<Article>> get() {
@@ -244,6 +207,10 @@ public class PkRSS {
 		return null;
 	}
 
+	/**
+	 * Retrieves an ArrayList of articles from the Favorite Database.
+	 * @return Either an Article List or null if database wasn't properly started.
+	 */
 	public List<Article> getFavorites() {
 		return favoriteDatabase == null ? null : favoriteDatabase.getAll();
 	}
@@ -314,6 +281,12 @@ public class PkRSS {
 		log("Deleting all favorites took " + (System.currentTimeMillis() - time) + "ms");
 	}
 
+	/**
+	 * Searches the FavoriteDatabase for the specified ID.
+	 * @param id Article ID which to search for.
+	 * @return {@code true} if database contains it or {@code false} if otherwise
+	 * or database not yet started.
+	 */
 	public boolean containsFavorite(int id) {
 		if(favoriteDatabase == null)
 			return false;
@@ -321,6 +294,10 @@ public class PkRSS {
 		return favoriteDatabase.contains(id);
 	}
 
+	/**
+	 * Clears {@link Downloader} cache.
+	 * @return {@code true} if successfully cleared or {@code false} if otherwise.
+	 */
 	public boolean clearCache() {
 		try {
 			httpClient.getCache().delete();
@@ -330,6 +307,11 @@ public class PkRSS {
 		}
 	}
 
+	/**
+	 * Clears all PkRSS data including Downloader cache, all articles in Favorite
+	 * Database, and all articles marked as read.
+	 * @return {@code true} if successfully cleared or {@code false} if otherwise.
+	 */
 	public boolean clearData() {
 		try {
 			httpClient.getCache().delete();
@@ -401,19 +383,19 @@ public class PkRSS {
 		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 	}
 
-	protected void log(String message) {
+	protected final void log(String message) {
 		log(TAG, message, Log.DEBUG);
 	}
 
-	protected void log(String tag, String message) {
+	protected final void log(String tag, String message) {
 		log(tag, message, Log.DEBUG);
 	}
 
-	protected void log(String message, int type) {
+	protected final void log(String message, int type) {
 		log(TAG, message, type);
 	}
 
-	protected void log(String tag, String message, int type) {
+	protected final void log(String tag, String message, int type) {
 		if(!loggingEnabled)
 			return;
 
@@ -443,6 +425,7 @@ public class PkRSS {
 	/** Fluent API for creating {@link PkRSS} instances. */
 	public static class Builder {
 		private final Context context;
+		private Downloader downloader;
 		private Parser parser;
 		private boolean loggingEnabled;
 
@@ -453,6 +436,11 @@ public class PkRSS {
 			if (context == null)
 				throw new IllegalArgumentException("Context must not be null!");
 			this.context = context.getApplicationContext();
+		}
+
+		public Builder downloader(Downloader downloader) {
+			this.downloader = downloader;
+			return this;
 		}
 
 		/**
@@ -480,7 +468,10 @@ public class PkRSS {
 			if(parser == null)
 				parser = new Rss2Parser();
 
-			return new PkRSS(context, parser);
+			if(downloader == null) // TODO Detect OkHttp
+				downloader = new OkHttpDownloader(context);
+
+			return new PkRSS(context, downloader, parser, loggingEnabled);
 		}
 
 		/**
