@@ -28,4 +28,17 @@ dependencies {
   compile group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.0.0'
 }
 
+task clearJar(type: Delete) {
+  delete 'build/libs/' + project.POM_ARTIFACT_ID + '_' + project.VERSION_NAME + '.jar'
+}
+
+task makeJar(type: Copy) {
+  from('build/intermediates/bundles/release/')
+  into('build/outputs/jar/')
+  include('classes.jar')
+  rename ('classes.jar', project.POM_ARTIFACT_ID + '-' +  project.VERSION_NAME + '.jar')
+}
+
+makeJar.dependsOn(clearJar, build)
+
 apply from: 'https://raw.github.com/Pkmmte/gradle-mvn-push/master/gradle-mvn-push.gradle'

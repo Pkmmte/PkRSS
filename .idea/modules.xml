@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PkRSS.iml" filepath="$PROJECT_DIR$/PkRSS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/PkRSS.iml" filepath="$PROJECT_DIR$/PkRSS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/PkRSS3.iml" filepath="$PROJECT_DIR$/PkRSS3.iml" />
       <module fileurl="file://$PROJECT_DIR$/pkrss/pkrss.iml" filepath="$PROJECT_DIR$/pkrss/pkrss.iml" />
     </modules>
   </component>

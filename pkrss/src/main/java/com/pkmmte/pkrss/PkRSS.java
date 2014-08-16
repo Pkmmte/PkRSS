@@ -54,7 +54,7 @@ public class PkRSS {
 	private final long httpReadTimeout = 45;
 
 	// Reusable XML Parser
-	private final RSSParser rssParser = new RSSParser(this);
+	private final Parser rssParser = new Rss2Parser(this);
 
 	// List of stored articles
 	private final Map<String, List<Article>> articleMap = new HashMap<String, List<Article>>();
@@ -170,11 +170,8 @@ public class PkRSS {
 			throw new IOException(e.getMessage());
 		}
 
-		// Create InputStream from response
-		InputStream inputStream = new ByteArrayInputStream(responseStr.getBytes());
-
 		// Parse articles from response and inset into global list
-		List<Article> newArticles = rssParser.parse(inputStream);
+		List<Article> newArticles = rssParser.parse(responseStr);
 		insert(url, newArticles);
 
 		// Call the callback, if available
@@ -237,8 +234,7 @@ public class PkRSS {
 		if(!read) {
 			readList.clear();
 			writeRead();
-			log("markAllRead(" + String.valueOf(read) + ") took " + (System.currentTimeMillis()
-				- time) + "ms");
+			log("markAllRead(" + String.valueOf(read) + ") took " + (System.currentTimeMillis() - time) + "ms");
 			return;
 		}
 
@@ -266,7 +262,6 @@ public class PkRSS {
 		return readList.get(id, false);
 	}
 
-	// TODO TODO TODO
 	public boolean saveFavorite(int id) {
 		return saveFavorite(get(id), true);
 	}
