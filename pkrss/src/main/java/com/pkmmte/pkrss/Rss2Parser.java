@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,17 +18,21 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+/**
+ * Custom PkRSS parser for parsing feeds using the RSS2 standard.
+ * This is the default parser. Use {@link PkRSS.Builder} to apply your own custom parser.
+ */
 public class Rss2Parser extends Parser {
 	private final List<Article> articleList = new ArrayList<Article>();
-	private final SimpleDateFormat dateFormat;
+	private final DateFormat dateFormat;
 	private final XmlPullParser xmlParser;
 
-	public Rss2Parser(PkRSS singleton) {
-		super(singleton);
-
+	public Rss2Parser() {
+		// Initialize DateFormat object with the default date formatting
 		dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.getDefault());
 		dateFormat.setTimeZone(Calendar.getInstance().getTimeZone());
 
+		// Initialize XmlPullParser object with a common configuration
 		XmlPullParser parser = null;
 		try {
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -42,24 +47,27 @@ public class Rss2Parser extends Parser {
 
 	@Override
 	public List<Article> parse(String rssStream) {
+		// Clear previous list and start timing execution time
 		articleList.clear();
 		long time = System.currentTimeMillis();
 
 		try {
+			// Get InputStream from String and set it to our XmlPullParser
 			InputStream input = new ByteArrayInputStream(rssStream.getBytes());
 			xmlParser.setInput(input, null);
+
+			// Reuse Article object and event holder
 			Article article = new Article();
 			int eventType = xmlParser.getEventType();
 
+			// Loop through the entire xml feed
 			while (eventType != XmlPullParser.END_DOCUMENT) {
 				String tagname = xmlParser.getName();
 				switch (eventType) {
 					case XmlPullParser.START_TAG:
-						if (tagname.equalsIgnoreCase("item")) {
-							// Create a new instance
+						if (tagname.equalsIgnoreCase("item")) // Start a new instance
 							article = new Article();
-						}
-						else
+						else // Handle this node if not an entry tag
 							handleNode(tagname, article);
 						break;
 					case XmlPullParser.END_TAG:
@@ -71,7 +79,9 @@ public class Rss2Parser extends Parser {
 							if(article.getImage() != null)
 								article.setContent(article.getContent().replaceFirst("<img.+?>", ""));
 
-							singleton.log(TAG, article.toShortString(), Log.INFO);
+							// (Optional) Log article contents... without the actual content
+							log(TAG, article.toShortString(), Log.INFO);
+
 							// Add article object to list
 							articleList.add(article);
 						}
@@ -83,14 +93,16 @@ public class Rss2Parser extends Parser {
 			}
 		}
 		catch (IOException e) {
+			// Uh oh
 			e.printStackTrace();
 		}
 		catch (XmlPullParserException e) {
+			// Oh noes
 			e.printStackTrace();
 		}
 
-		singleton.log(TAG, "Parsing took " + (System.currentTimeMillis() - time) + "ms");
-
+		// Output execution time and return list of newly parsed articles
+		log(TAG, "Parsing took " + (System.currentTimeMillis() - time) + "ms");
 		return articleList;
 	}
 
@@ -180,7 +192,7 @@ public class Rss2Parser extends Parser {
 			}
 		}
 		catch (Exception e) {
-			singleton.log(TAG, "Error pulling image link from description!\n" + e.getMessage(), Log.WARN);
+			log(TAG, "Error pulling image link from description!\n" + e.getMessage(), Log.WARN);
 		}
 
 		return "";

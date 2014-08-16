@@ -8,12 +8,10 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Response;
 import com.squareup.okhttp.Request;
-import java.io.ByteArrayInputStream;
+import com.squareup.okhttp.Response;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +52,7 @@ public class PkRSS {
 	private final long httpReadTimeout = 45;
 
 	// Reusable XML Parser
-	private final Parser rssParser = new Rss2Parser(this);
+	private final Parser parser;
 
 	// List of stored articles
 	private final Map<String, List<Article>> articleMap = new HashMap<String, List<Article>>();
@@ -68,18 +66,35 @@ public class PkRSS {
 	// Database storing all articles marked as favorite
 	private final FavoriteDatabase favoriteDatabase;
 
+	/**
+	 * The global default {@link PkRSS} instance.
+	 * <p>
+	 * This instance is automatically initialized with defaults that are suitable to most
+	 * implementations.
+	 * <p>
+	 * If these settings do not meet the requirements of your application, you can construct your own
+	 * instance with full control over the configuration by using {@link PkRSS.Builder}.
+	 * You may also use {@link PkRSS.Builder#buildSingleton()} to build the singleton or
+	 * {@link PkRSS.Builder#replaceSingleton()} to replace the existing singleton if it differs.
+	 */
 	public static PkRSS with(Context context) {
 		if(singleton == null)
-			singleton = new PkRSS(context.getApplicationContext());
+			singleton = new Builder(context).build();
 		return singleton;
 	}
 
+	/**
+	 * Returns the global singleton instance. It may be null so use wisely!
+	 * @return Global singleton instance. May be null.
+	 */
 	protected static PkRSS getInstance() {
 		return singleton;
 	}
 
-	protected PkRSS(Context context) {
+	PkRSS(Context context, Parser parser) {
 		this.mContext = context;
+		this.parser = parser;
+		this.parser.attachInstance(this);
 		this.mPrefs = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
 		getRead();
 		try {
@@ -94,10 +109,16 @@ public class PkRSS {
 		favoriteDatabase = new FavoriteDatabase(context);
 	}
 
+	/**
+	 * Toggle whether debug logging is enabled.
+	 */
 	public void setLoggingEnabled(boolean enabled) {
 		loggingEnabled = enabled;
 	}
 
+	/**
+	 * {@code true} if debug logging is enabled.
+	 */
 	public boolean isLoggingEnabled() {
 		return loggingEnabled;
 	}
@@ -171,7 +192,7 @@ public class PkRSS {
 		}
 
 		// Parse articles from response and inset into global list
-		List<Article> newArticles = rssParser.parse(responseStr);
+		List<Article> newArticles = parser.parse(responseStr);
 		insert(url, newArticles);
 
 		// Call the callback, if available
@@ -416,6 +437,73 @@ public class PkRSS {
 			default:
 				Log.wtf(tag, message);
 				break;
+		}
+	}
+
+	/** Fluent API for creating {@link PkRSS} instances. */
+	public static class Builder {
+		private final Context context;
+		private Parser parser;
+		private boolean loggingEnabled;
+
+		/**
+		 * Start building a new {@link PkRSS} instance.
+		 */
+		public Builder(Context context) {
+			if (context == null)
+				throw new IllegalArgumentException("Context must not be null!");
+			this.context = context.getApplicationContext();
+		}
+
+		/**
+		 * Specifies a custom {@link Parser} Object for which to parse data with.
+		 * <b>Default: </b> {@link Rss2Parser}
+		 */
+		public Builder parser(Parser parser) {
+			this.parser = parser;
+			return this;
+		}
+
+		/**
+		 * Toggle whether debug logging is enabled.
+		 * <b>Default: </b> {@code false}
+		 */
+		public Builder loggingEnabled(boolean enabled) {
+			this.loggingEnabled = enabled;
+			return this;
+		}
+
+		/**
+		 * Creates a {@link PkRSS} instance.
+		 */
+		public PkRSS build() {
+			if(parser == null)
+				parser = new Rss2Parser();
+
+			return new PkRSS(context, parser);
+		}
+
+		/**
+		 * Creates a {@link PkRSS} instance and assigns it to the
+		 * global {@link PkRSS#singleton} instance if it doesn't already exists.
+		 */
+		public void buildSingleton() {
+			if(singleton == null)
+				singleton = build();
+			else
+				Log.e(TAG, "Cannot buildSingleton(), a singleton already exists! Ignoring request...");
+		}
+
+		/**
+		 * <b><i>Use wisely!</i></b>
+		 * <p>
+		 * Creates a {@link PkRSS} instance and replaces the existing
+		 * global {@link PkRSS#singleton} instance if it differs.
+		 * <p>
+		 * <b>Do NOT use this unless you really have to!</b>
+		 */
+		public void replaceSingleton() {
+			// TODO
 		}
 	}
 }
