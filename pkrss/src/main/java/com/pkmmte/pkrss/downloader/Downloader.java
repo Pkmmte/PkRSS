@@ -12,9 +12,10 @@ public abstract class Downloader {
 	final String TAG = "Downloader";
 	PkRSS singleton;
 
+	public abstract boolean clearCache();
 	public abstract String execute(Request request) throws IllegalArgumentException, IOException;
-	public abstract String toUrl(Request request);
 	public abstract String toSafeUrl(Request request);
+	public abstract String toUrl(Request request);
 
 	/**
 	 * Attaches a {@link PkRSS} singleton instance to this Parser for logging purposes.

@@ -2,44 +2,37 @@ package com.pkmmte.pkrss.downloader;
 
 import android.content.Context;
 import android.net.Uri;
+import android.net.http.HttpResponseCache;
 import android.util.Log;
 import com.pkmmte.pkrss.Request;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Response;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-public class OkHttpDownloader extends Downloader {
+public class DefaultDownloader extends Downloader {
 	// OkHttpClient & configuration
-	private final OkHttpClient client = new OkHttpClient();
-	private final String cacheDir = "/okhttp";
+	private final File cacheDir;
 	private final int cacheSize = 1024 * 1024;
 	private final int cacheMaxAge = 2 * 60 * 60;
-	private final long connectTimeout = 15;
-	private final long readTimeout = 45;
+	private final long connectTimeout = 15000;
+	private final long readTimeout = 45000;
 
-	public OkHttpDownloader(Context context) {
-		this.client.setConnectTimeout(connectTimeout, TimeUnit.SECONDS);
-		this.client.setReadTimeout(readTimeout, TimeUnit.SECONDS);
-
+	public DefaultDownloader(Context context)  {
+		cacheDir = new File(context.getCacheDir(), "http");
 		try {
-			File cacheDir = new File(context.getCacheDir().getAbsolutePath() + this.cacheDir);
-			this.client.setCache(new Cache(cacheDir, cacheSize));
-		} catch (Exception e) {
-			Log.e(TAG, "Error configuring Downloader cache! \n" + e.getMessage());
+			HttpResponseCache.install(cacheDir, cacheSize);
+		}
+		catch (IOException e) {
+			Log.i(TAG, "HTTP response cache installation failed:" + e);
 		}
 	}
 
 	@Override
 	public boolean clearCache() {
-		try {
-			client.getCache().delete();
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
+		return deleteDir(cacheDir);
 	}
 
 	@Override
@@ -60,28 +53,40 @@ public class OkHttpDownloader extends Downloader {
 
 		// Build proper URL
 		String requestUrl = toUrl(request);
+		URL url = new URL(requestUrl);
 
-		// Build the OkHttp request
-		com.squareup.okhttp.Request httpRequest = new com.squareup.okhttp.Request.Builder()
-			.addHeader("Cache-Control", "public, max-age=" + maxCacheAge)
-			.url(requestUrl)
-			.build();
+		// Open a connection and configure timeouts/cache
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setRequestProperty("Cache-Control", "public, max-age=" + maxCacheAge);
+		connection.setConnectTimeout((int) connectTimeout);
+		connection.setReadTimeout((int) readTimeout);
 
+		// Execute the request and log its data
+		log("Making a request to " + requestUrl + (request.skipCache ? " [SKIP-CACHE]" : " [MAX-AGE " + maxCacheAge + "]"));
+		connection.connect();
+
+		// Read stream
+		InputStream stream = null;
 		try {
-			// Execute the built request and log its data
-			log("Making a request to " + requestUrl + (request.skipCache ? " [SKIP-CACHE]" : " [MAX-AGE " + maxCacheAge + "]"));
-			Response response = client.newCall(httpRequest).execute();
+			// I really don't feel comfortable using InputStreams...
+			stream = new BufferedInputStream(url.openStream(), 8192);
+			int ch;
+			StringBuffer builder = new StringBuffer();
+			while ((ch = stream.read()) != -1) {
+				builder.append((char) ch);
+			}
 
-			// Was this retrieved from cache?
-			if (response.cacheResponse() != null) log("Response retrieved from cache");
-
-			// Convert response body to a string
-			responseStr = response.body().string();
+			// Convert stream to a string
+			responseStr = builder.toString();
 			log(TAG, "Request download took " + (System.currentTimeMillis() - time) + "ms", Log.INFO);
 		} catch (Exception e) {
 			log("Error executing/reading http request!", Log.ERROR);
 			e.printStackTrace();
 			throw new IOException(e.getMessage());
+		} finally {
+			if (stream != null)
+				stream.close();
+			connection.disconnect();
 		}
 
 		return responseStr;
@@ -123,5 +128,23 @@ public class OkHttpDownloader extends Downloader {
 
 		// Return safe url
 		return url;
+	}
+
+	/**
+	 * Deletes the specified directory.
+	 * Returns true if successful, false if not.
+	 *
+	 * @param dir
+	 * @return
+	 */
+	private boolean deleteDir(File dir) {
+		if (dir != null && dir.isDirectory()) {
+			String[] children = dir.list();
+			for (int i = 0; i < children.length; i++) {
+				if (!deleteDir(new File(dir, children[i])))
+					return false;
+			}
+		}
+		return dir.delete();
 	}
 }

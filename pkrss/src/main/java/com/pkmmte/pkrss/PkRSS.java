@@ -48,7 +48,6 @@ public class PkRSS {
 
 	// Our handy client for getting XML feed data
 	private final Downloader downloader;
-	private final OkHttpClient httpClient = new OkHttpClient();
 	private final String httpCacheDir = "/okhttp";
 	private final int httpCacheSize = 1024 * 1024;
 	private final int httpCacheMaxAge = 2 * 60 * 60;
@@ -104,15 +103,6 @@ public class PkRSS {
 		this.loggingEnabled = loggingEnabled;
 		this.mPrefs = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
 		getRead();
-		try {
-			File cacheDir = new File(context.getCacheDir().getAbsolutePath() + httpCacheDir);
-			this.httpClient.setCache(new Cache(cacheDir, httpCacheSize));
-			this.httpClient.setConnectTimeout(httpConnectTimeout, TimeUnit.SECONDS);
-			this.httpClient.setReadTimeout(httpReadTimeout, TimeUnit.SECONDS);
-		}
-		catch (Exception e) {
-			Log.e(TAG, "Error configuring OkHttp client! \n" + e.getMessage());
-		}
 		favoriteDatabase = new FavoriteDatabase(context);
 	}
 
@@ -121,6 +111,7 @@ public class PkRSS {
 	 */
 	public void setLoggingEnabled(boolean enabled) {
 		loggingEnabled = enabled;
+		Log.d(TAG, "Logging is now " + (enabled ? "enabled" : "disabled"));
 	}
 
 	/**
@@ -299,12 +290,7 @@ public class PkRSS {
 	 * @return {@code true} if successfully cleared or {@code false} if otherwise.
 	 */
 	public boolean clearCache() {
-		try {
-			httpClient.getCache().delete();
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
+		return downloader.clearCache();
 	}
 
 	/**
@@ -313,14 +299,11 @@ public class PkRSS {
 	 * @return {@code true} if successfully cleared or {@code false} if otherwise.
 	 */
 	public boolean clearData() {
-		try {
-			httpClient.getCache().delete();
-			deleteAllFavorites();
-			markAllRead(false);
-			return true;
-		} catch (IOException e) {
+		if (!downloader.clearCache())
 			return false;
-		}
+		deleteAllFavorites();
+		markAllRead(false);
+		return true;
 	}
 
 	protected Map<String, Integer> getPageTracker() {
@@ -468,8 +451,8 @@ public class PkRSS {
 			if(parser == null)
 				parser = new Rss2Parser();
 
-			if(downloader == null) // TODO Detect OkHttp
-				downloader = new OkHttpDownloader(context);
+			if(downloader == null)
+				downloader = Utils.createDefaultDownloader(context);
 
 			return new PkRSS(context, downloader, parser, loggingEnabled);
 		}
