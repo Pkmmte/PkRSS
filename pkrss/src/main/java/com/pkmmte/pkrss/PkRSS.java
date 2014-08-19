@@ -6,21 +6,23 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import com.pkmmte.pkrss.downloader.DefaultDownloader;
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.downloader.OkHttpDownloader;
 import com.pkmmte.pkrss.parser.Parser;
 import com.pkmmte.pkrss.parser.Rss2Parser;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Response;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * A powerful RSS feed manager for Android
+ * <p>
+ * Use {@link #with(android.content.Context)} for the global singleton instance or construct your
+ * own instance with {@link PkRSS.Builder}.
+ */
 public class PkRSS {
 	// General public constant keys
 	public static final String KEY_ARTICLE = "ARTICLE";
@@ -121,10 +123,25 @@ public class PkRSS {
 		return loggingEnabled;
 	}
 
+	/**
+	 * Starts a request with the specified URL.
+	 * <p>
+	 * URLs may be anything you wish as long as the {@link Parser} and/or
+	 * {@link Downloader} supports it. See {@link PkRSS.Builder} for using
+	 * your own custom Downloaders/Parsers.
+	 * @param url URL to load feed from.
+	 * @return A chained Request.
+	 */
 	public RequestCreator load(String url) {
 		return new RequestCreator(this, url);
 	}
 
+	/**
+	 * Handles the specified {@link Request}. May throw an {@link IOException} for
+	 * mishandled URLs or timeouts.
+	 * @param request Request to execute.
+	 * @throws IOException
+	 */
 	protected void load(final Request request) throws IOException {
 		// Don't load if URL is the favorites key
 		if(request.url.equals(KEY_FAVORITES)) {
@@ -154,10 +171,21 @@ public class PkRSS {
 			request.callback.OnLoaded(newArticles);
 	}
 
+	/**
+	 * Returns a {@link HashMap<String, List<Article>} containing all loaded
+	 * Article objects. The map key being the safe url.
+	 * @return
+	 */
 	public Map<String, List<Article>> get() {
 		return articleMap;
 	}
 
+	/**
+	 * Looks up the specified URL String from the saved HashMap.
+	 * @param url Safe URL to look up loaded articles from. May also be {@link PkRSS#KEY_FAVORITES}.
+	 * @return A {@link List} containing all loaded articles associated with that
+	 * URL. May be null if no such URL has yet been loaded.
+	 */
 	public List<Article> get(String url) {
 		if(url.equals(KEY_FAVORITES))
 			return getFavorites();
@@ -165,6 +193,13 @@ public class PkRSS {
 		return articleMap.get(url);
 	}
 
+	/**
+	 * Similar to {@link PkRSS#get(String)} but also looks for the search term.
+	 * @param url Safe URL to look up loaded articles from.
+	 * @param search Search term.
+	 * @return A {@link List} containing all loaded articles associated with that
+	 * URL and query. May be null if no such URL has yet been loaded.
+	 */
 	public List<Article> get(String url, String search) {
 		if(search == null)
 			return articleMap.get(url);
@@ -172,6 +207,12 @@ public class PkRSS {
 		return articleMap.get(url + "?s=" + Uri.encode(search));
 	}
 
+	/**
+	 * Returns an {@link Article} object associated with the specified id.
+	 * @param id ID belonging to such article.
+	 * @return The Article associated with the specified id. May return null if
+	 * no such article was found with that ID.
+	 */
 	public Article get(int id) {
 		long time = System.currentTimeMillis();
 
@@ -206,6 +247,12 @@ public class PkRSS {
 		return favoriteDatabase == null ? null : favoriteDatabase.getAll();
 	}
 
+	/**
+	 * Marks/Unmarks all loaded articles as read. This includes those loaded from
+	 * all URLs and those stored in the favorites database. Those loaded after this
+	 * was called will still be unread.
+	 * @param read
+	 */
 	public void markAllRead(boolean read) {
 		long time = System.currentTimeMillis();
 
@@ -232,39 +279,83 @@ public class PkRSS {
 		log("markAllRead(" + String.valueOf(read) + ") took " + (System.currentTimeMillis() - time) + "ms");
 	}
 
+	/**
+	 * Marks an article id as read.
+	 * @param id Article id to store its read state.
+	 * @param read Whether or not to mark this id as read.
+	 */
 	public void markRead(int id, boolean read) {
 		readList.put(id, read);
 		writeRead();
 	}
 
+	/**
+	 * @param id Article ID to check for its read state.
+	 * @return {@code true} if such id was previously marked as read,
+	 * {@code false} if it has not yet been marked as read.
+	 */
 	public boolean isRead(int id) {
 		return readList.get(id, false);
 	}
 
+	/**
+	 * Saves an {@link Article} object to the favorites database.
+	 * <p>
+	 * If possible, use the Article object itself instead to increase performance!
+	 * @param id ID of the article to save.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean saveFavorite(int id) {
 		return saveFavorite(get(id), true);
 	}
 
+	/**
+	 * Saves/Deletes an {@link Article} object to the favorites database.
+	 * <p>
+	 * If possible, use the Article object itself instead to increase performance!
+	 * @param id ID of the article to save.
+	 * @param favorite Whether to save or delete. {@code true} to save; {@code false} to delete.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean saveFavorite(int id, boolean favorite) {
 		return saveFavorite(get(id), favorite);
 	}
 
+	/**
+	 * Saves an {@link Article} object to the favorites database.
+	 * @param article Article object to save.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean saveFavorite(Article article) {
 		return saveFavorite(article, true);
 	}
 
+	/**
+	 * Saves/Deletes an {@link Article} object to the favorites database.
+	 * @param article Article object to save.
+	 * @param favorite Whether to save or delete. {@code true} to save; {@code false} to delete.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean saveFavorite(Article article, boolean favorite) {
 		long time = System.currentTimeMillis();
 		log("Adding article " + article.getId() + " to favorites...");
-		if(favorite)
-			favoriteDatabase.add(article);
-		else
-			favoriteDatabase.delete(article);
+		try {
+			if (favorite)
+				favoriteDatabase.add(article);
+			else
+				favoriteDatabase.delete(article);
+		}
+		catch (Exception e) {
+			log("Error " + (favorite ? "saving article to" : "deleting article from") + " favorites database.", Log.ERROR);
+		}
 
 		log("Saving article " + article.getId() + " to favorites took " + (System.currentTimeMillis() - time) + "ms");
 		return true;
 	}
 
+	/**
+	 * Clears the favorites database.
+	 */
 	public void deleteAllFavorites() {
 		long time = System.currentTimeMillis();
 		log("Deleting all favorites...");
@@ -306,10 +397,19 @@ public class PkRSS {
 		return true;
 	}
 
+	/**
+	 * @return The {@link Map} used for storing page states.
+	 */
 	protected Map<String, Integer> getPageTracker() {
 		return pageTracker;
 	}
 
+	/**
+	 * Inserts the passed list into the article map database.
+	 * This will be cleared once the instance dies.
+	 * @param url URL to associate this list with.
+	 * @param newArticles Article list to store.
+	 */
 	private void insert(String url, List<Article> newArticles) {
 		if(!articleMap.containsKey(url))
 			articleMap.put(url, new ArrayList<Article>());
@@ -320,6 +420,9 @@ public class PkRSS {
 		log("New size for " + url + " is " + articleList.size());
 	}
 
+	/**
+	 * Asynchronously loads read data.
+	 */
 	private void getRead() {
 		// Execute on background thread as we don't know how large this is
 		new AsyncTask<Void, Void, Void>() {
@@ -341,6 +444,9 @@ public class PkRSS {
 		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 	}
 
+	/**
+	 * Asynchronously saves read data.
+	 */
 	private void writeRead() {
 		// Execute on background thread as we don't know how large this is
 		new AsyncTask<Void, Void, Void>() {
@@ -421,13 +527,17 @@ public class PkRSS {
 			this.context = context.getApplicationContext();
 		}
 
+		/**
+		 * Specifies a custom {@link Downloader} Object for which to load data with. <br />
+		 * <b>Default: </b> Either {@link DefaultDownloader} or {@link OkHttpDownloader} (See more... {@link Utils#createDefaultDownloader(Context)})
+		 */
 		public Builder downloader(Downloader downloader) {
 			this.downloader = downloader;
 			return this;
 		}
 
 		/**
-		 * Specifies a custom {@link Parser} Object for which to parse data with.
+		 * Specifies a custom {@link Parser} Object for which to parse data with. <br />
 		 * <b>Default: </b> {@link Rss2Parser}
 		 */
 		public Builder parser(Parser parser) {

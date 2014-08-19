@@ -1,20 +1,44 @@
 package com.pkmmte.pkrss.downloader;
 
 import android.util.Log;
-import com.pkmmte.pkrss.Callback;
 import com.pkmmte.pkrss.PkRSS;
 import com.pkmmte.pkrss.Request;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Downloader {
 	// For logging purposes
 	final String TAG = "Downloader";
 	PkRSS singleton;
 
+	/**
+	 * Clears the {@link Downloader} cache.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public abstract boolean clearCache();
+
+	/**
+	 * Executes the specified request and returns the response String.
+	 * @param request PkRSS Request object containing all necessary parameters.
+	 * @return Response String to parse
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
 	public abstract String execute(Request request) throws IllegalArgumentException, IOException;
+
+	/**
+	 * Parses a request into a safe URL to be used for caching/tracking purposes.
+	 * <p>
+	 * <b>Note:</b> Returning an invalid URL may cause caching errors and mishandled memory.
+	 * @param request PkRSS Request object containing all necessary parameters.
+	 * @return Safe URL String to be used for tracking and caching purposes.
+	 */
 	public abstract String toSafeUrl(Request request);
+
+	/**
+	 * Parses a request into a URL to be used for execution.
+	 * @param request PkRSS Request object containing all necessary parameters.
+	 * @return A URL String to load data from.
+	 */
 	public abstract String toUrl(Request request);
 
 	/**

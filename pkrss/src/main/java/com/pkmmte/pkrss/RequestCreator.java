@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+// TODO
+// - Create thread handler class to keep track of all requests
 public class RequestCreator {
 	private final PkRSS singleton;
 	private final Request.Builder data;
@@ -56,7 +58,7 @@ public class RequestCreator {
 
 	/**
 	 * Loads a specific page of the RSS feed.
-	 * @param page
+	 * @param page Page to load.
 	 */
 	public RequestCreator page(int page) {
 		this.data.page(page);
@@ -112,7 +114,6 @@ public class RequestCreator {
 	 * with this request. This is useful for individual Article requests.
 	 * <p>
 	 * May return null.
-	 *
 	 * @return Returns the first article associated with this request.
 	 */
 	public Article getFirst() {
@@ -135,7 +136,6 @@ public class RequestCreator {
 	public void async() {
 		final Request request = data.build();
 
-		// TODO Create thread handler class to keep track of all these
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {

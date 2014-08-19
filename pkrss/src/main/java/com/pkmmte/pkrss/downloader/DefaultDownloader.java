@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.net.http.HttpResponseCache;
 import android.util.Log;
 import com.pkmmte.pkrss.Request;
+import com.pkmmte.pkrss.Utils;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class DefaultDownloader extends Downloader {
 
 	@Override
 	public boolean clearCache() {
-		return deleteDir(cacheDir);
+		return Utils.deleteDir(cacheDir);
 	}
 
 	@Override
@@ -128,23 +129,5 @@ public class DefaultDownloader extends Downloader {
 
 		// Return safe url
 		return url;
-	}
-
-	/**
-	 * Deletes the specified directory.
-	 * Returns true if successful, false if not.
-	 *
-	 * @param dir
-	 * @return
-	 */
-	private boolean deleteDir(File dir) {
-		if (dir != null && dir.isDirectory()) {
-			String[] children = dir.list();
-			for (int i = 0; i < children.length; i++) {
-				if (!deleteDir(new File(dir, children[i])))
-					return false;
-			}
-		}
-		return dir.delete();
 	}
 }
