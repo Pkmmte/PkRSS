@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Pkrss by Pkmmte</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Pkrss</h1>
+        <h2>A powerful RSS feed manager for Android</h2>
+        <a href="https://github.com/Pkmmte/PkRSS" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="pkrss" class="anchor" href="#pkrss"><span class="octicon octicon-link"></span></a>PkRSS</h1>
+
+<p>A fluent and flexible RSS feed manager for Android</p>
+
+<p>For more information, please see <a href="https://github.com/Pkmmte/TechDissected">the website</a></p>
+
+<h2>
+<a name="download" class="anchor" href="#download"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p>Download <a href="http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&amp;g=com.pkmmte.pkrss&amp;a=pkrss&amp;v=LATEST">the latest JAR</a> or grab via Gradle:</p>
+
+<div class="highlight highlight-groovy"><pre><span class="n">compile</span> <span class="s1">'com.pkmmte.pkrss:pkrss:1.0.1'</span>
+</pre></div>
+
+<p>or Maven:</p>
+
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.pkmmte.pkrss<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>pkrss<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+<h2>
+<a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a>Basic Usage</h2>
+
+<p>PkRSS features a fluent API which allows you to create flexible requests - often using only one line of code. For a full application sample, see the <a href="https://github.com/Pkmmte/TechDissected">TechDissected Source Code</a></p>
+
+<h5>
+<a name="basic-loading" class="anchor" href="#basic-loading"><span class="octicon octicon-link"></span></a>Basic Loading</h5>
+
+<p>This code loads the specified URL asynchronously. </p>
+
+<div class="highlight highlight-java"><pre><span class="n">PkRSS</span><span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="na">load</span><span class="o">(</span><span class="n">url</span><span class="o">).</span><span class="na">async</span><span class="o">();</span>
+</pre></div>
+
+<h5>
+<a name="pagination--callbacks" class="anchor" href="#pagination--callbacks"><span class="octicon octicon-link"></span></a>Pagination &amp; Callbacks</h5>
+
+<p>The following loads the next page belonging to the specified url and assigns a callback. PkRSS keeps track of which page was last loaded using a PageTracker. You may also manually specify a page number using <code>page(int)</code>.</p>
+
+<div class="highlight highlight-java"><pre><span class="n">PkRSS</span><span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="na">load</span><span class="o">(</span><span class="n">url</span><span class="o">).</span><span class="na">nextPage</span><span class="o">().</span><span class="na">callback</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="na">async</span><span class="o">();</span>
+</pre></div>
+
+<h5>
+<a name="search--synchronous-requests" class="anchor" href="#search--synchronous-requests"><span class="octicon octicon-link"></span></a>Search &amp; Synchronous Requests</h5>
+
+<p>You are able to query for a specific search term on a specified feed and get the result synchronously. Pagination is also supported for search queries.</p>
+
+<div class="highlight highlight-java"><pre><span class="n">PkRSS</span><span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="na">load</span><span class="o">(</span><span class="n">url</span><span class="o">).</span><span class="na">search</span><span class="o">(</span><span class="n">query</span><span class="o">).</span><span class="na">page</span><span class="o">(</span><span class="kt">int</span><span class="o">).</span><span class="na">get</span><span class="o">();</span>
+</pre></div>
+
+<p>There are a lot more APIs available such as custom parsers, mark articles as read/favorited, instance builder, custom article objects, request cancelling, and more! See <a href="https://github.com/Pkmmte/TechDissected">the website</a> for more info or <a href="https://github.com/Pkmmte/TechDissected">read the Javadoc</a>.</p>
+
+<h2>
+<a name="proguard" class="anchor" href="#proguard"><span class="octicon octicon-link"></span></a>ProGuard</h2>
+
+<p>If you are using ProGuard make sure you add the following option:</p>
+
+<pre><code>-dontwarn com.squareup.okhttp.**
+</code></pre>
+
+<h2>
+<a name="developed-by" class="anchor" href="#developed-by"><span class="octicon octicon-link"></span></a>Developed By</h2>
+
+<p>Pkmmte Xeleon - <a href="http://www.pkmmte.com">www.pkmmte.com</a></p>
+
+<p><a href="https://plus.google.com/102226057091361048952">
+  <img alt="Follow me on Google+" src="http://data.pkmmte.com/temp/social_google_plus_logo.png"></a>
+<a href="https://www.linkedin.com/pub/pkmmte-xeleon/7a/409/b4b/">
+  <img alt="Follow me on LinkedIn" src="http://data.pkmmte.com/temp/social_linkedin_logo.png"></a></p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>Copyright 2014 Pkmmte Xeleon
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/Pkmmte/PkRSS/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/Pkmmte/PkRSS/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/Pkmmte/PkRSS"></a> is maintained by <a href="https://github.com/Pkmmte">Pkmmte</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
