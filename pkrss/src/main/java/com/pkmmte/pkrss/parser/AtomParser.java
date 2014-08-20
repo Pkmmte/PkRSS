@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
 import com.pkmmte.pkrss.Article;
-import com.pkmmte.pkrss.PkRSS;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,18 +19,14 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-/**
- * Custom PkRSS parser for parsing feeds using the RSS2 standard.
- * This is the default parser. Use {@link PkRSS.Builder} to apply your own custom parser.
- */
-public class Rss2Parser extends Parser {
+public class AtomParser extends Parser {
 	private final List<Article> articleList = new ArrayList<Article>();
 	private final DateFormat dateFormat;
 	private final XmlPullParser xmlParser;
 
-	public Rss2Parser() {
+	public AtomParser() {
 		// Initialize DateFormat object with the default date formatting
-		dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.getDefault());
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
 		dateFormat.setTimeZone(Calendar.getInstance().getTimeZone());
 
 		// Initialize XmlPullParser object with a common configuration
@@ -67,13 +62,13 @@ public class Rss2Parser extends Parser {
 				String tagname = xmlParser.getName();
 				switch (eventType) {
 					case XmlPullParser.START_TAG:
-						if (tagname.equalsIgnoreCase("item")) // Start a new instance
+						if (tagname.equalsIgnoreCase("entry")) // Start a new instance
 							article = new Article();
 						else // Handle this node if not an entry tag
 							handleNode(tagname, article);
 						break;
 					case XmlPullParser.END_TAG:
-						if (tagname.equalsIgnoreCase("item")) {
+						if (tagname.equalsIgnoreCase("entry")) {
 							// Generate ID
 							article.setId(Math.abs(article.hashCode()));
 
@@ -117,27 +112,33 @@ public class Rss2Parser extends Parser {
 	 */
 	private boolean handleNode(String tag, Article article) {
 		try {
+			if (tag.equalsIgnoreCase("category"))
+				article.setNewTag(xmlParser.getAttributeValue(null, "term"));
+			else if (tag.equalsIgnoreCase("link")) {
+				String rel = xmlParser.getAttributeValue(null, "rel");
+				if (rel.equalsIgnoreCase("alternate"))
+					article.setSource(Uri.parse(xmlParser.getAttributeValue(null, "href")));
+				else if (rel.equalsIgnoreCase("replies"))
+					article.setComments(xmlParser.getAttributeValue(null, "href"));
+			}
+
 			if(xmlParser.next() != XmlPullParser.TEXT)
 				return false;
 
-			if (tag.equalsIgnoreCase("link"))
-				article.setSource(Uri.parse(xmlParser.getText()));
-			else if (tag.equalsIgnoreCase("title"))
+			if (tag.equalsIgnoreCase("title"))
 				article.setTitle(xmlParser.getText());
-			else if (tag.equalsIgnoreCase("description")) {
+			else if (tag.equalsIgnoreCase("summary")) {
 				String encoded = xmlParser.getText();
 				article.setImage(Uri.parse(pullImageLink(encoded)));
 				article.setDescription(Html.fromHtml(encoded.replaceAll("<img.+?>", "")).toString());
 			}
-			else if (tag.equalsIgnoreCase("content:encoded"))
+			else if (tag.equalsIgnoreCase("content"))
 				article.setContent(xmlParser.getText().replaceAll("[<](/)?div[^>]*[>]", ""));
-			else if (tag.equalsIgnoreCase("wfw:commentRss"))
-				article.setComments(xmlParser.getText());
 			else if (tag.equalsIgnoreCase("category"))
 				article.setNewTag(xmlParser.getText());
-			else if (tag.equalsIgnoreCase("dc:creator"))
+			else if (tag.equalsIgnoreCase("name"))
 				article.setAuthor(xmlParser.getText());
-			else if (tag.equalsIgnoreCase("pubDate")) {
+			else if (tag.equalsIgnoreCase("published")) {
 				article.setDate(getParsedDate(xmlParser.getText()));
 			}
 
@@ -160,7 +161,7 @@ public class Rss2Parser extends Parser {
 	 */
 	private long getParsedDate(String encodedDate) {
 		try {
-			return dateFormat.parse(dateFormat.format(dateFormat.parseObject(encodedDate))).getTime();
+			return dateFormat.parse(dateFormat.format(dateFormat.parseObject(encodedDate.replaceAll("Z$", "+0000")))).getTime();
 		}
 		catch (ParseException e) {
 			log(TAG, "Error parsing date " + encodedDate, Log.WARN);
