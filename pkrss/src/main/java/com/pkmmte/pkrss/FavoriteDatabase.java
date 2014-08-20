@@ -96,7 +96,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 			if (cursor != null)
 				cursor.moveToFirst();
 
-			article = new Article(Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(1)), Uri.parse(cursor.getString(2)), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getLong(8), cursor.getInt(9));
+			article = new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(1)), Uri.parse(cursor.getString(2)), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getLong(8), cursor.getInt(9));
 
 		}
 		finally {
@@ -116,7 +116,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 
 		if (cursor.moveToLast()) {
 			do {
-				articleList.add(new Article(Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(1)), Uri.parse(cursor.getString(2)), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getLong(8), cursor.getInt(9)));
+				articleList.add(new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(1)), Uri.parse(cursor.getString(2)), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getLong(8), cursor.getInt(9)));
 			} while (cursor.moveToPrevious());
 		}
 		db.close();
@@ -143,20 +143,5 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_ARTICLES, null, null);
 		db.close();
-	}
-
-	public int getCount() {
-		int count = 0;
-		String countQuery = "SELECT  * FROM " + TABLE_ARTICLES;
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(countQuery, null);
-
-		if (cursor != null && !cursor.isClosed()) {
-			count = cursor.getCount();
-			cursor.close();
-		}
-
-		db.close();
-		return count;
 	}
 }

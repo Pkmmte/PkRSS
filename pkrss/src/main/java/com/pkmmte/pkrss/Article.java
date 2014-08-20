@@ -1,12 +1,14 @@
 package com.pkmmte.pkrss;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Article implements Parcelable {
+	private Bundle extras;
 	private List<String> tags;
 	private Uri source;
 	private Uri image;
@@ -19,6 +21,7 @@ public class Article implements Parcelable {
 	private int id;
 
 	public Article() {
+		this.extras = new Bundle();
 		this.tags = new ArrayList<String>();
 		this.source = null;
 		this.image = null;
@@ -31,8 +34,9 @@ public class Article implements Parcelable {
 		this.id = -1;
 	}
 
-	public Article(List<String> tags, Uri source, Uri image, String title, String description, String content, String comments, String author, long date, int id) {
-		this.tags = tags;
+	public Article(Bundle extras, List<String> tags, Uri source, Uri image, String title, String description, String content, String comments, String author, long date, int id) {
+		this.extras = extras == null ? new Bundle() : extras;
+		this.tags = tags == null ? new ArrayList<String>() : tags;
 		this.source = source;
 		this.image = image;
 		this.title = title;
@@ -42,90 +46,141 @@ public class Article implements Parcelable {
 		this.author = author;
 		this.date = date;
 		this.id = id;
+	}
+
+	public Object getExtra(String key) {
+		return extras.get(key);
+	}
+
+	public String getExtraString(String key) {
+		return extras.getString(key);
+	}
+
+	public int getExtraInt(String key) {
+		return extras.getInt(key);
+	}
+
+	public boolean getExtraBoolean(String key) {
+		return extras.getBoolean(key);
+	}
+
+	public Bundle getExtras() {
+		return extras;
+	}
+
+	public Article putExtra(String key, String value) {
+		this.extras.putString(key, value);
+		return this;
+	}
+
+	public Article putExtra(String key, int value) {
+		this.extras.putInt(key, value);
+		return this;
+	}
+
+	public Article putExtra(String key, boolean value) {
+		this.extras.putBoolean(key, value);
+		return this;
+	}
+
+	public Article setExtras(Bundle extras) {
+		this.extras = extras;
+		return this;
 	}
 
 	public List<String> getTags() {
 		return tags;
 	}
 
-	public void setTags(List<String> tags) {
+	public Article setTags(List<String> tags) {
 		this.tags = tags;
+		return this;
 	}
 
-	public void setNewTag(String tag) {
+	public Article setNewTag(String tag) {
 		this.tags.add(tag);
+		return this;
 	}
 
 	public Uri getSource() {
 		return source;
 	}
 
-	public void setSource(Uri source) {
+	public Article setSource(Uri source) {
 		this.source = source;
+		return this;
 	}
 
 	public Uri getImage() {
 		return image;
 	}
 
-	public void setImage(Uri image) {
+	public Article setImage(Uri image) {
 		this.image = image;
+		return this;
 	}
 
 	public String getTitle() {
 		return title;
 	}
 
-	public void setTitle(String title) {
+	public Article setTitle(String title) {
 		this.title = title;
+		return this;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public Article setDescription(String description) {
 		this.description = description;
+		return this;
 	}
 
 	public String getContent() {
 		return content;
 	}
 
-	public void setContent(String content) {
+	public Article setContent(String content) {
 		this.content = content;
+		return this;
 	}
 
 	public String getComments() {
 		return comments;
 	}
 
-	public void setComments(String comments) {
+	public Article setComments(String comments) {
 		this.comments = comments;
+		return this;
 	}
 
 	public String getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(String author) {
+	public Article setAuthor(String author) {
 		this.author = author;
+		return this;
 	}
 
 	public long getDate() {
 		return date;
 	}
 
-	public void setDate(long date) {
+	public Article setDate(long date) {
 		this.date = date;
+		return this;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public Article setId(int id) {
 		this.id = id;
+		return this;
 	}
 
 	public boolean isRead() {
@@ -137,8 +192,7 @@ public class Article implements Parcelable {
 	}
 
 	public boolean markRead(boolean read) {
-		if(PkRSS.getInstance() == null)
-			return false;
+		if (PkRSS.getInstance() == null) return false;
 
 		PkRSS.getInstance().markRead(id, read);
 		return true;
@@ -153,8 +207,7 @@ public class Article implements Parcelable {
 	}
 
 	public boolean saveFavorite(boolean favorite) {
-		if(PkRSS.getInstance() == null)
-			return false;
+		if (PkRSS.getInstance() == null) return false;
 
 		return PkRSS.getInstance().saveFavorite(this, favorite);
 	}
@@ -175,7 +228,8 @@ public class Article implements Parcelable {
 	@Override
 	public String toString() {
 		return "Article{" +
-			"tags=" + tags +
+			"extras=" + extras +
+			", tags=" + tags +
 			", source=" + source +
 			", image=" + image +
 			", title='" + title + '\'' +
@@ -198,14 +252,10 @@ public class Article implements Parcelable {
 		if (date != article.date) return false;
 		if (id != article.id) return false;
 		if (author != null ? !author.equals(article.author) : article.author != null) return false;
-		if (comments != null ? !comments.equals(article.comments) : article.comments != null)
-			return false;
-		if (content != null ? !content.equals(article.content) : article.content != null)
-			return false;
-		if (description != null ? !description.equals(article.description)
-			: article.description != null) {
-			return false;
-		}
+		if (comments != null ? !comments.equals(article.comments) : article.comments != null) return false;
+		if (content != null ? !content.equals(article.content) : article.content != null) return false;
+		if (description != null ? !description.equals(article.description) : article.description != null) return false;
+		if (!extras.equals(article.extras)) return false;
 		if (image != null ? !image.equals(article.image) : article.image != null) return false;
 		if (source != null ? !source.equals(article.source) : article.source != null) return false;
 		if (!tags.equals(article.tags)) return false;
@@ -216,7 +266,8 @@ public class Article implements Parcelable {
 
 	@Override
 	public int hashCode() {
-		int result = tags.hashCode();
+		int result = extras.hashCode();
+		result = 31 * result + tags.hashCode();
 		result = 31 * result + (source != null ? source.hashCode() : 0);
 		result = 31 * result + (image != null ? image.hashCode() : 0);
 		result = 31 * result + (title != null ? title.hashCode() : 0);
@@ -230,10 +281,12 @@ public class Article implements Parcelable {
 	}
 
 	protected Article(Parcel in) {
+		extras = in.readBundle();
 		if (in.readByte() == 0x01) {
 			tags = new ArrayList<String>();
 			in.readList(tags, String.class.getClassLoader());
-		} else {
+		}
+		else {
 			tags = null;
 		}
 		source = (Uri) in.readValue(Uri.class.getClassLoader());
@@ -253,9 +306,11 @@ public class Article implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeBundle(extras);
 		if (tags == null) {
 			dest.writeByte((byte) (0x00));
-		} else {
+		}
+		else {
 			dest.writeByte((byte) (0x01));
 			dest.writeList(tags);
 		}
