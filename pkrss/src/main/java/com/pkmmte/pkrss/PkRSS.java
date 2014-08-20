@@ -50,11 +50,6 @@ public class PkRSS {
 
 	// Our handy client for getting XML feed data
 	private final Downloader downloader;
-	private final String httpCacheDir = "/okhttp";
-	private final int httpCacheSize = 1024 * 1024;
-	private final int httpCacheMaxAge = 2 * 60 * 60;
-	private final long httpConnectTimeout = 15;
-	private final long httpReadTimeout = 45;
 
 	// Reusable XML Parser
 	private final Parser parser;
@@ -472,6 +467,28 @@ public class PkRSS {
 		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		PkRSS pkRSS = (PkRSS) o;
+
+		if (loggingEnabled != pkRSS.loggingEnabled) return false;
+		if (!downloader.equals(pkRSS.downloader)) return false;
+		if (!parser.equals(pkRSS.parser)) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = (loggingEnabled ? 1 : 0);
+		result = 31 * result + downloader.hashCode();
+		result = 31 * result + parser.hashCode();
+		return result;
+	}
+
 	protected final void log(String message) {
 		log(TAG, message, Log.DEBUG);
 	}
@@ -582,12 +599,18 @@ public class PkRSS {
 		 * <b><i>Use wisely!</i></b>
 		 * <p>
 		 * Creates a {@link PkRSS} instance and replaces the existing
-		 * global {@link PkRSS#singleton} instance if it differs.
+		 * global {@link PkRSS#singleton} instance if the hash codes differ.
 		 * <p>
-		 * <b>Do NOT use this unless you really have to!</b>
+		 * <i>Do NOT use this unless you really have to!</i>
 		 */
 		public void replaceSingleton() {
-			// TODO
+			PkRSS newInstance = build();
+			if(singleton == null || !newInstance.equals(singleton)) {
+				singleton = newInstance;
+				Log.d(TAG, "Replaced global singleton instance.");
+			}
+			else
+				Log.e(TAG, "Could not replace singleton instance. Same instance already exists.");
 		}
 	}
 }
