@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="4" by="lint 23.0.2">
+
+    <issue
+        id="CommitPrefEdits"
+        severity="Warning"
+        message="Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Looks for code editing a `SharedPreference` but forgetting to call `commit()` on it"
+        explanation="After calling `edit()` on a `SharedPreference`, you must call `commit()` or `apply()` on the editor to save the results."
+        errorLine1="    editor.commit();"
+        errorLine2="    ~~~~~~~~~~~~~~~">
+        <location
+            file="D:\Users\Pkmmte\GitHub\PkRSS\pkrss\src\main\java\com\pkmmte\pkrss\PkRSS.java"
+            line="463"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="InvalidPackage"
+        severity="Error"
+        message="Invalid package reference in library; not included in Android: java.nio.file. Referenced from okio.Okio."
+        category="Correctness"
+        priority="6"
+        summary="Finds API accesses to APIs that are not supported in Android"
+        explanation="This check scans through libraries looking for calls to APIs that are not included in Android.
+
+When you create Android projects, the classpath is set up such that you can only access classes in the API packages that are included in Android. However, if you add other projects to your libs/ folder, there is no guarantee that those .jar files were built with an Android specific classpath, and in particular, they could be accessing unsupported APIs such as java.applet.
+
+This check scans through library jars and looks for references to API packages that are not included in Android and flags these. This is only an error if your code calls one of the library classes which wind up referencing the unsupported package.">
+        <location
+            file="C:\Users\Family\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.0.0\2534c458682c73f5b9871131ab3098d3f987ca3\okio-1.0.0.jar"/>
+    </issue>
+
+    <issue
+        id="AllowBackup"
+        severity="Warning"
+        message="Should explicitly set android:allowBackup to true or false (it&apos;s true by default, and that can have some security implications for the application&apos;s data)"
+        category="Security"
+        priority="3"
+        summary="Ensure that allowBackup is explicitly set in the application&apos;s manifest"
+        explanation="The allowBackup attribute determines if an application&apos;s data can be backed up and restored. It is documented at http://developer.android.com/reference/android/R.attr.html#allowBackup
+
+By default, this flag is set to `true`. When this flag is set to `true`, application data can be backed up and restored by the user using `adb backup` and `adb restore`.
+
+This may have security consequences for an application. `adb backup` allows users who have enabled USB debugging to copy application data off of the device. Once backed up, all application data can be read by the user. `adb restore` allows creation of application data from a source specified by the user. Following a restore, applications should not assume that the data, file permissions, and directory permissions were created by the application itself.
+
+Setting `allowBackup=&quot;false&quot;` opts an application out of both backup and restore.
+
+To fix this warning, decide whether your application should support backup, and explicitly set `android:allowBackup=(true|false)&quot;`"
+        url="http://developer.android.com/reference/android/R.attr.html#allowBackup"
+        urls="http://developer.android.com/reference/android/R.attr.html#allowBackup"
+        quickfix="adt">
+        <location
+            file="D:\Users\Pkmmte\GitHub\PkRSS\pkrss\src\main\AndroidManifest.xml"/>
+    </issue>
+
+</issues>

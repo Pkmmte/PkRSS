@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="2" >
+
+    <dataSet config="main" >
+        <source path="D:\Users\Pkmmte\GitHub\PkRSS\pkrss\src\main\res" />
+        <source path="D:\Users\Pkmmte\GitHub\PkRSS\pkrss\build\generated\res\rs\release" />
+        <source path="D:\Users\Pkmmte\GitHub\PkRSS\pkrss\build\generated\res\generated\release" />
+    </dataSet>
+    <dataSet config="release" >
+        <source path="D:\Users\Pkmmte\GitHub\PkRSS\pkrss\src\release\res" />
+    </dataSet>
+
+</merger>
