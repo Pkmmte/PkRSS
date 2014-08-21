@@ -87,6 +87,6 @@ License
     limitations under the License.
 
  [1]: http://pkmmte.github.io/PkRSS/
- [2]: http://search.maven.org/#search|gav|1|g:"com.pkmmte.pkrss"%20AND%20a:"pkrss"
+ [2]: https://github.com/Pkmmte/PkRSS/releases/download/v1.1.1/pkrss-1.1.1.jar
  [3]: https://github.com/Pkmmte/TechDissected
- [4]: http://pkmmte.github.io/PkRSS/javadocs/
+ [4]: http://pkmmte.github.io/PkRSS/javadoc/
