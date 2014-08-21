@@ -10,14 +10,14 @@ Download
 
 Download [the latest JAR][2] or grab via Gradle:
 ```groovy
-compile 'com.pkmmte.pkrss:pkrss:1.0.1'
+compile 'com.pkmmte.pkrss:pkrss:1.1.1'
 ```
 or Maven:
 ```xml
 <dependency>
     <groupId>com.pkmmte.pkrss</groupId>
     <artifactId>pkrss</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
@@ -86,7 +86,7 @@ License
     See the License for the specific language governing permissions and
     limitations under the License.
 
- [1]: https://github.com/Pkmmte/TechDissected
- [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.pkmmte.pkrss&a=pkrss&v=LATEST
+ [1]: http://pkmmte.github.io/PkRSS/
+ [2]: http://search.maven.org/#search|gav|1|g:"com.pkmmte.pkrss"%20AND%20a:"pkrss"
  [3]: https://github.com/Pkmmte/TechDissected
- [4]: https://github.com/Pkmmte/TechDissected
+ [4]: http://pkmmte.github.io/PkRSS/javadocs/
