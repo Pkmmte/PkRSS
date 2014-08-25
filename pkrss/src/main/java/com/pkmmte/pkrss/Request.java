@@ -1,5 +1,6 @@
 package com.pkmmte.pkrss;
 
+import com.pkmmte.pkrss.parser.Parser;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class Request {
@@ -11,15 +12,17 @@ public final class Request {
 	public final boolean individual;
 	public final boolean skipCache;
 	public final int page;
+	public final Parser parser;
 	public final Callback callback;
 
-	public Request(String url, String search, boolean individual, boolean skipCache, int page, Callback callback) {
+	public Request(String url, String search, boolean individual, boolean skipCache, int page, Parser parser, Callback callback) {
 		this.tag = String.valueOf(ID_GENERATOR.incrementAndGet());
 		this.url = url;
 		this.search = search;
 		this.individual = individual;
 		this.skipCache = skipCache;
 		this.page = page;
+		this.parser = parser;
 		this.callback = callback;
 	}
 
@@ -30,6 +33,7 @@ public final class Request {
 		this.individual = builder.individual;
 		this.skipCache = builder.skipCache;
 		this.page = builder.page;
+		this.parser = builder.parser;
 		this.callback = builder.callback;
 	}
 
@@ -40,6 +44,7 @@ public final class Request {
 		private boolean individual;
 		private boolean skipCache;
 		private int page;
+		private Parser parser;
 		private Callback callback;
 
 		public Builder(String url) {
@@ -49,6 +54,7 @@ public final class Request {
 			this.individual = false;
 			this.skipCache = false;
 			this.page = 1;
+			this.parser = null;
 			this.callback = null;
 		}
 
@@ -79,6 +85,11 @@ public final class Request {
 
 		public Builder page(int page) {
 			this.page = page;
+			return this;
+		}
+
+		public Builder parser(Parser parser) {
+			this.parser = parser;
 			return this;
 		}
 

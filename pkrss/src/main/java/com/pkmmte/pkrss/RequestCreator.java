@@ -2,6 +2,7 @@ package com.pkmmte.pkrss;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import com.pkmmte.pkrss.parser.Parser;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,17 @@ public class RequestCreator {
 			page = pageTracker.get(url);
 
 		this.data.page(page + 1);
+		return this;
+	}
+
+	/**
+	 * Assigns a different parser to handle this specific request.
+	 * This is useful for parsing separate data such as comments feeds.
+	 * @param parser Custom parser which to override the set parser
+	 * for this request and this request only.
+	 */
+	public RequestCreator parser(Parser parser) {
+		this.data.parser(parser);
 		return this;
 	}
 

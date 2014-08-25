@@ -123,7 +123,8 @@ public class PkRSS {
 	 * <p>
 	 * URLs may be anything you wish as long as the {@link Parser} and/or
 	 * {@link Downloader} supports it. See {@link PkRSS.Builder} for using
-	 * your own custom Downloaders/Parsers.
+	 * your own custom Downloaders/Parsers. If necessary, you may use a custom
+	 * parser for this specific request via {@link RequestCreator#parser(Parser)}.
 	 * @param url URL to load feed from.
 	 * @return A chained Request.
 	 */
@@ -148,7 +149,7 @@ public class PkRSS {
 		if(request.callback != null)
 			request.callback.OnPreLoad();
 
-		// Create a copy for pagination & handle cache
+		// Create safe url for pagination/indexing purposes
 		String safeUrl = downloader.toSafeUrl(request);
 
 		// Put the page index into the request's HashMap
@@ -158,7 +159,7 @@ public class PkRSS {
 		String response = downloader.execute(request);
 
 		// Parse articles from response and inset into global list
-		List<Article> newArticles = parser.parse(response);
+		List<Article> newArticles = request.parser == null ? parser.parse(response) : request.parser.parse(response);
 		insert(safeUrl, newArticles);
 
 		// Call the callback, if available
