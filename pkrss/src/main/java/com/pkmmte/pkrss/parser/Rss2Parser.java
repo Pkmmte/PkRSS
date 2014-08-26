@@ -78,7 +78,7 @@ public class Rss2Parser extends Parser {
 							article.setId(Math.abs(article.hashCode()));
 
 							// Remove content thumbnail
-							if(article.getImage() != null)
+							if(article.getImage() != null && article.getContent() != null)
 								article.setContent(article.getContent().replaceFirst("<img.+?>", ""));
 
 							// (Optional) Log article contents... without the actual content
