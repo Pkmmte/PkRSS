@@ -2,6 +2,7 @@ package com.pkmmte.pkrss;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.parser.Parser;
 import java.io.IOException;
 import java.util.List;
@@ -85,6 +86,17 @@ public class RequestCreator {
 			page = pageTracker.get(url);
 
 		this.data.page(page + 1);
+		return this;
+	}
+
+	/**
+	 * Assigns a different downloader to handle this specific request.
+	 * This may be useful under certain rare conditions or for miscellaneous purposes.
+	 * @param downloader Custom downloader which to override the set downloader
+	 * for this request and this request only.
+	 */
+	public RequestCreator downloader(Downloader downloader) {
+		this.data.downloader(downloader);
 		return this;
 	}
 

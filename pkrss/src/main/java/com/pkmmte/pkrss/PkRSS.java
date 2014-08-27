@@ -156,7 +156,7 @@ public class PkRSS {
 		pageTracker.put(safeUrl, request.page);
 
 		// Get response from this request
-		String response = downloader.execute(request);
+		String response = request.downloader == null ? downloader.execute(request) : request.downloader.execute(request);
 
 		// Parse articles from response and inset into global list
 		List<Article> newArticles = request.parser == null ? parser.parse(response) : request.parser.parse(response);
