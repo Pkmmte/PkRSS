@@ -5,6 +5,13 @@ import com.pkmmte.pkrss.Article;
 import com.pkmmte.pkrss.PkRSS;
 import java.util.List;
 
+/**
+ * Base Parser class for Parser objects.
+ * <p>
+ * Extend this class upon creating your own custom parser. You may
+ * handle any type of data as long as you are able to make an Article
+ * ArrayList out of it.
+ */
 public abstract class Parser {
 	// For logging purposes
 	final String TAG = "Parser";

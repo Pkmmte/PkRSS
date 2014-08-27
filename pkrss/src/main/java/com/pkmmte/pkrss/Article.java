@@ -7,6 +7,9 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main Article class for storing all parsed/downloaded data.
+ */
 public class Article implements Parcelable {
 	private Bundle extras;
 	private List<String> tags;
@@ -48,149 +51,280 @@ public class Article implements Parcelable {
 		this.id = id;
 	}
 
+	/**
+	 * Returns the entry with the given key as an object.
+	 * @param key A String key.
+	 * @return An Object, or null.
+	 */
 	public Object getExtra(String key) {
 		return extras.get(key);
 	}
 
+	/**
+	 * Returns the value associated with the given key.
+	 * @param key A String key.
+	 * @return A String value, or null.
+	 */
 	public String getExtraString(String key) {
 		return extras.getString(key);
 	}
 
+	/**
+	 * Returns the value associated with the given key.
+	 * @param key A String key.
+	 * @return An int value, or null.
+	 */
 	public int getExtraInt(String key) {
 		return extras.getInt(key);
 	}
 
+	/**
+	 * Returns the value associated with the given key.
+	 * @param key A String key.
+	 * @return A boolean value, or null.
+	 */
 	public boolean getExtraBoolean(String key) {
 		return extras.getBoolean(key);
 	}
 
+	/**
+	 * @return The Bundle object used to store all extra values.
+	 */
 	public Bundle getExtras() {
 		return extras;
 	}
 
+	/**
+	 * Inserts a given value into a Bundle associated with this Article instance.
+	 * @param key A String key.
+	 * @param value Value to insert.
+	 */
 	public Article putExtra(String key, String value) {
 		this.extras.putString(key, value);
 		return this;
 	}
 
+	/**
+	 * Inserts a given value into a Bundle associated with this Article instance.
+	 * @param key A String key.
+	 * @param value Value to insert.
+	 */
 	public Article putExtra(String key, int value) {
 		this.extras.putInt(key, value);
 		return this;
 	}
 
+	/**
+	 * Inserts a given value into a Bundle associated with this Article instance.
+	 * @param key A String key.
+	 * @param value Value to insert.
+	 */
 	public Article putExtra(String key, boolean value) {
 		this.extras.putBoolean(key, value);
 		return this;
 	}
 
+	/**
+	 * Replaces all article extras with the passed extras Bundle.
+	 * @param extras Bundle to override the current one with.
+	 */
 	public Article setExtras(Bundle extras) {
 		this.extras = extras;
 		return this;
 	}
 
+	/**
+	 * @return A String List containing this article's tags.
+	 */
 	public List<String> getTags() {
 		return tags;
 	}
 
+	/**
+	 * Overrides the current list of tags with a new one.
+	 * @param tags Tag List to override the current one with.
+	 */
 	public Article setTags(List<String> tags) {
 		this.tags = tags;
 		return this;
 	}
 
+	/**
+	 * Adds a new tag to this article.
+	 * @param tag String value to add as a tag.
+	 */
 	public Article setNewTag(String tag) {
 		this.tags.add(tag);
 		return this;
 	}
 
+	/**
+	 * @return A Uri containing the source address of this article.
+	 * (In other words, a link to this article)
+	 */
 	public Uri getSource() {
 		return source;
 	}
 
+	/**
+	 * Sets the source of the article.
+	 * @param source Simple Uri object referencing the source. It may be a URL or null.
+	 */
 	public Article setSource(Uri source) {
 		this.source = source;
 		return this;
 	}
 
+	/**
+	 * @return A Uri containing the main image source. It may be a URL, resource, asset, or null.
+	 */
 	public Uri getImage() {
 		return image;
 	}
 
+	/**
+	 * Sets the main article image.
+	 * @param image Simple Uri object referencing the image source. It may be a URL, resource, asset, or null.
+	 */
 	public Article setImage(Uri image) {
 		this.image = image;
 		return this;
 	}
 
+	/**
+	 * @return String containing the article's title. May be null.
+	 */
 	public String getTitle() {
 		return title;
 	}
 
+	/**
+	 * Sets the article's title.
+	 * @param title String containing this article's title.
+	 */
 	public Article setTitle(String title) {
 		this.title = title;
 		return this;
 	}
 
+	/**
+	 * @return String containing the article's description. May be null.
+	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * Sets the article's description.
+	 * @param description String containing this article's description.
+	 */
 	public Article setDescription(String description) {
 		this.description = description;
 		return this;
 	}
 
+	/**
+	 * @return String containing the article's content. May be null.
+	 */
 	public String getContent() {
 		return content;
 	}
 
+	/**
+	 * Sets the article's content.
+	 * @param content String containing this article's content.
+	 */
 	public Article setContent(String content) {
 		this.content = content;
 		return this;
 	}
 
+	/**
+	 * @return String containing the source to this article's comments. May be null.
+	 */
 	public String getComments() {
 		return comments;
 	}
 
+	/**
+	 * Sets the article's comment source.
+	 * @param comments String containing the source to this article's comments.
+	 */
 	public Article setComments(String comments) {
 		this.comments = comments;
 		return this;
 	}
 
+	/**
+	 * @return String containing the article's author. May be null.
+	 */
 	public String getAuthor() {
 		return author;
 	}
 
+	/**
+	 * Sets the article's author.
+	 * @param author String containing this article's author.
+	 */
 	public Article setAuthor(String author) {
 		this.author = author;
 		return this;
 	}
 
+	/**
+	 * @return long containing the article's raw date.
+	 */
 	public long getDate() {
 		return date;
 	}
 
+	/**
+	 * Sets the article's raw date.
+	 * @param date String containing this article's raw date. Usually expressed in milliseconds.
+	 */
 	public Article setDate(long date) {
 		this.date = date;
 		return this;
 	}
 
+	/**
+	 * @return long containing the article's id. IDs are normally generated based on the properties' hashcodes combined.
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * Sets the article's id.
+	 * @param id Long containing this article's id. Be sure to provide a unique id as it will be used for indexing.
+	 */
 	public Article setId(int id) {
 		this.id = id;
 		return this;
 	}
 
+	/**
+	 * Looks up the read index for this article's id.
+	 * @return {@code true} if this article's id has been marked as read,
+	 * {@code false} if otherwise or instance has not yet been created.
+	 */
 	public boolean isRead() {
 		return PkRSS.getInstance() == null ? false : PkRSS.getInstance().isRead(id);
 	}
 
+	/**
+	 * Adds this article's id to the read index.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean markRead() {
 		return markRead(true);
 	}
 
+	/**
+	 * Adds this article's id to the read index.
+	 * @param read Whether or not to mark it as read.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean markRead(boolean read) {
 		if (PkRSS.getInstance() == null) return false;
 
@@ -198,23 +332,42 @@ public class Article implements Parcelable {
 		return true;
 	}
 
+	/**
+	 * Looks up the favorite database for this article's id.
+	 * @return {@code true} if this article is in the favorites database,
+	 * {@code false} if otherwise, instance has not yet been created, or an error occurred.
+	 */
 	public boolean isFavorite() {
 		return PkRSS.getInstance() == null ? false : PkRSS.getInstance().containsFavorite(id);
 	}
 
+	/**
+	 * Adds this article into the favorites database.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean saveFavorite() {
 		return saveFavorite(true);
 	}
 
+	/**
+	 * Adds this article into the favorites database.
+	 * @param favorite Whether to add it or remove it.
+	 * @return {@code true} if successful, {@code false} if otherwise.
+	 */
 	public boolean saveFavorite(boolean favorite) {
 		if (PkRSS.getInstance() == null) return false;
 
 		return PkRSS.getInstance().saveFavorite(this, favorite);
 	}
 
+	/**
+	 * Similar to {@link #toString()} but ommits the content and description.
+	 * @return A small-ish String describing this article's properties.
+	 */
 	public String toShortString() {
 		return "Article{" +
-			"tags=" + tags +
+			"extras=" + extras +
+			", tags=" + tags +
 			", source=" + source +
 			", image=" + image +
 			", title='" + title + '\'' +

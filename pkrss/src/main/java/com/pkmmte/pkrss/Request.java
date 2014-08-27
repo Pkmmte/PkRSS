@@ -3,6 +3,9 @@ package com.pkmmte.pkrss;
 import com.pkmmte.pkrss.parser.Parser;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Immutable data to be used for execution.
+ */
 public final class Request {
 	private static final AtomicLong ID_GENERATOR = new AtomicLong(System.currentTimeMillis() * 100000);
 

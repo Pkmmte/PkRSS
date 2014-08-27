@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-// TODO
-// - Create thread handler class to keep track of all requests
+/**
+ * Fluent API for building an RSS load request.
+ */
 public class RequestCreator {
 	private final PkRSS singleton;
 	private final Request.Builder data;

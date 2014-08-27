@@ -13,6 +13,13 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * The Default Downloader object used for general purposes.
+ * <p>
+ * This Downloader class uses Android's built-in HttpUrlConnection for
+ * networking. It is recommended to use the OkHttpDownloader instead as
+ * it is more stable and potentially performs better.
+ */
 public class DefaultDownloader extends Downloader {
 	// OkHttpClient & configuration
 	private final File cacheDir;

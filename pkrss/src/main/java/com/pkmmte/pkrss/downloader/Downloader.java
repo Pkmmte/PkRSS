@@ -5,6 +5,13 @@ import com.pkmmte.pkrss.PkRSS;
 import com.pkmmte.pkrss.Request;
 import java.io.IOException;
 
+/**
+ * Base Downloader class for Downloader objects.
+ * <p>
+ * Extend this class upon creating your own custom downloader. You may
+ * do anything you want with it as long as you're able to return data
+ * and format URLs properly.
+ */
 public abstract class Downloader {
 	// For logging purposes
 	final String TAG = "Downloader";
@@ -28,6 +35,9 @@ public abstract class Downloader {
 	/**
 	 * Parses a request into a safe URL to be used for caching/tracking purposes.
 	 * <p>
+	 * You'd normally want to build something similar as {@link #toUrl(Request)} with the exception
+	 * of certain parameters such as pagination or extra useless data.
+	 * <p>
 	 * <b>Note:</b> Returning an invalid URL may cause caching errors and mishandled memory.
 	 * @param request PkRSS Request object containing all necessary parameters.
 	 * @return Safe URL String to be used for tracking and caching purposes.
@@ -37,12 +47,12 @@ public abstract class Downloader {
 	/**
 	 * Parses a request into a URL to be used for execution.
 	 * @param request PkRSS Request object containing all necessary parameters.
-	 * @return A URL String to load data from.
+	 * @return A URL String to load valid data from.
 	 */
 	public abstract String toUrl(Request request);
 
 	/**
-	 * Attaches a {@link PkRSS} singleton instance to this Parser for logging purposes.
+	 * Attaches a {@link PkRSS} singleton instance to this Downloader for logging purposes.
 	 * @param singleton Singleton instance to attach to this Parser
 	 */
 	public final void attachInstance(PkRSS singleton) {

@@ -11,6 +11,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * An improved version of the DefaultDownloader using the OkHttp library.
+ * <p>
+ * This Downloader class uses Square's OkHttp library for networking. It is
+ * preferred over the DefaultDownloader and often performs better than the default
+ * implementation although it requires you to include OkHttp as a dependency to your project.
+ */
 public class OkHttpDownloader extends Downloader {
 	// OkHttpClient & configuration
 	private final OkHttpClient client = new OkHttpClient();
