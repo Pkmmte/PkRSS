@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
 import com.pkmmte.pkrss.Article;
+import com.pkmmte.pkrss.PkRSS;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,11 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+/**
+ * Custom PkRSS parser for parsing feeds using the Atom format.
+ * This is the default parser. Use {@link PkRSS.Builder} to apply your own custom parser
+ * or modify an existing one.
+ */
 public class AtomParser extends Parser {
 	private final List<Article> articleList = new ArrayList<Article>();
 	private final DateFormat dateFormat;
@@ -73,10 +79,10 @@ public class AtomParser extends Parser {
 							article.setId(Math.abs(article.hashCode()));
 
 							// Remove content thumbnail
-							if(article.getImage() != null)
+							if(article.getImage() != null && article.getContent() != null)
 								article.setContent(article.getContent().replaceFirst("<img.+?>", ""));
 
-							// (Optional) Log article contents... without the actual content
+							// (Optional) Log a minimized version of the toString() output
 							log(TAG, article.toShortString(), Log.INFO);
 
 							// Add article object to list
