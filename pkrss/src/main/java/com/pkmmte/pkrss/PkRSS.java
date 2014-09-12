@@ -157,7 +157,7 @@ public class PkRSS {
 			request.handler.onPreload(request.callback);
 
 		// Create safe url for pagination/indexing purposes
-		String safeUrl = downloader.toSafeUrl(request);
+		String safeUrl = request.downloader == null ? downloader.toSafeUrl(request) : request.downloader.toSafeUrl(request);
 
 		// Put the page index into the request's HashMap
 		pageTracker.put(safeUrl, request.page);
