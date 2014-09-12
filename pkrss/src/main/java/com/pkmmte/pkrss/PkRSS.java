@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import com.pkmmte.pkrss.downloader.DefaultDownloader;
@@ -41,6 +42,9 @@ public class PkRSS {
 	// For issue tracking purposes
 	private volatile boolean loggingEnabled;
 	protected static final String TAG = "PkRSS";
+
+	// Callback Thread Handler
+	protected final CallbackHandler handler;
 
 	// Context is always useful for some reason.
 	private final Context mContext;
@@ -91,8 +95,9 @@ public class PkRSS {
 		return singleton;
 	}
 
-	PkRSS(Context context, Downloader downloader, Parser parser, boolean loggingEnabled) {
+	PkRSS(Context context, CallbackHandler handler, Downloader downloader, Parser parser, boolean loggingEnabled) {
 		this.mContext = context;
+		this.handler = handler;
 		this.downloader = downloader;
 		this.downloader.attachInstance(this);
 		this.parser = parser;
@@ -145,9 +150,11 @@ public class PkRSS {
 			return;
 		}
 
-		// Call the callback, if available
-		if(request.callback != null)
-			request.callback.OnPreLoad();
+		// Call the "OnPreload" code, if available
+		if(request.callback != null && request.handler == null)
+			handler.onPreload(request.callback);
+		else if(request.callback != null)
+			request.handler.onPreload(request.callback);
 
 		// Create safe url for pagination/indexing purposes
 		String safeUrl = downloader.toSafeUrl(request);
@@ -162,9 +169,11 @@ public class PkRSS {
 		List<Article> newArticles = request.parser == null ? parser.parse(response) : request.parser.parse(response);
 		insert(safeUrl, newArticles);
 
-		// Call the callback, if available
-		if(request.callback != null)
-			request.callback.OnLoaded(newArticles);
+		// Call the "OnLoaded" code, if available
+		if(request.callback != null && request.handler == null)
+			handler.onLoaded(request.callback, newArticles);
+		else if(request.callback != null)
+			request.handler.onLoaded(request.callback, newArticles);
 	}
 
 	/**
@@ -476,6 +485,7 @@ public class PkRSS {
 		PkRSS pkRSS = (PkRSS) o;
 
 		if (loggingEnabled != pkRSS.loggingEnabled) return false;
+		if (!handler.equals(pkRSS.handler)) return false;
 		if (!downloader.equals(pkRSS.downloader)) return false;
 		if (!parser.equals(pkRSS.parser)) return false;
 
@@ -485,6 +495,7 @@ public class PkRSS {
 	@Override
 	public int hashCode() {
 		int result = (loggingEnabled ? 1 : 0);
+		result = 31 * result + handler.hashCode();
 		result = 31 * result + downloader.hashCode();
 		result = 31 * result + parser.hashCode();
 		return result;
@@ -532,6 +543,7 @@ public class PkRSS {
 	/** Fluent API for creating {@link PkRSS} instances. */
 	public static class Builder {
 		private final Context context;
+		private CallbackHandler handler;
 		private Downloader downloader;
 		private Parser parser;
 		private boolean loggingEnabled;
@@ -543,6 +555,16 @@ public class PkRSS {
 			if (context == null)
 				throw new IllegalArgumentException("Context must not be null!");
 			this.context = context.getApplicationContext();
+		}
+
+		/**
+		 * Specifies the thread for which to execute callbacks on.
+		 * Setting this to null executes callbacks on the same thread in which the request was called. <br />
+		 * <b>Default: </b> {@code null}
+		 */
+		public Builder handler(Handler handler) {
+			this.handler = new CallbackHandler(handler);
+			return this;
 		}
 
 		/**
@@ -582,7 +604,10 @@ public class PkRSS {
 			if(downloader == null)
 				downloader = Utils.createDefaultDownloader(context);
 
-			return new PkRSS(context, downloader, parser, loggingEnabled);
+			if(handler == null)
+				handler = new CallbackHandler();
+
+			return new PkRSS(context, handler, downloader, parser, loggingEnabled);
 		}
 
 		/**
