@@ -1,6 +1,8 @@
 package com.pkmmte.pkrss;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.parser.Parser;
@@ -90,6 +92,17 @@ public class RequestCreator {
 	}
 
 	/**
+	 * Assigns a different callback handler to this specific request.
+	 * This is useful for handling this request in a specific thread but leaving the rest
+	 * as before. If you'd like to force the main thread handler, use <b>new Handler(Looper.getMainLooper());</b>
+	 * @param handler Handler thread in which to run the callback for this request.
+	 */
+	public RequestCreator handler(Handler handler) {
+		this.data.handler(new CallbackHandler(handler));
+		return this;
+	}
+
+	/**
 	 * Assigns a different downloader to handle this specific request.
 	 * This may be useful under certain rare conditions or for miscellaneous purposes.
 	 * @param downloader Custom downloader which to override the set downloader
@@ -167,9 +180,14 @@ public class RequestCreator {
 				try {
 					singleton.load(request);
 				} catch (IOException e) {
+					// Log
 					singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
-					if(request.callback != null)
-						request.callback.OnLoadFailed();
+
+					// Callback
+					if(request.callback != null && request.handler == null)
+						singleton.handler.onLoadFailed(request.callback);
+					else if(request.callback != null)
+						request.handler.onLoadFailed(request.callback);
 				}
 				return null;
 			}

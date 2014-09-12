@@ -23,11 +23,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="PkRSS.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="PkRSS.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/PkRSS.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6464471" vertical-offset="2364" max-vertical-offset="10319">
-              <caret line="167" column="44" selection-start-line="167" selection-start-column="44" selection-end-line="167" selection-end-column="44" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="6334" max-vertical-offset="10421">
+              <caret line="395" column="7" selection-start-line="395" selection-start-column="7" selection-end-line="395" selection-end-column="7" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -77,12 +77,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RequestCreator.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="RequestCreator.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/RequestCreator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1581" max-vertical-offset="3111">
-              <caret line="93" column="85" selection-start-line="93" selection-start-column="85" selection-end-line="93" selection-end-column="85" />
+            <state vertical-scroll-proportion="0.5677966" vertical-offset="1297" max-vertical-offset="3230">
+              <caret line="104" column="7" selection-start-line="104" selection-start-column="7" selection-end-line="104" selection-end-column="7" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Request.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/Request.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1377" max-vertical-offset="2244">
+              <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1364,13 +1376,13 @@
         <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/downloader/OkHttpDownloader.java" />
         <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/FavoriteDatabase.java" />
         <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/Article.java" />
-        <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/RequestCreator.java" />
-        <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/Request.java" />
         <option value="$PROJECT_DIR$/gradle.properties" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/Callback.java" />
         <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/CallbackHandler.java" />
+        <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/Request.java" />
         <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/PkRSS.java" />
+        <option value="$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/RequestCreator.java" />
       </list>
     </option>
   </component>
@@ -2251,22 +2263,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/RequestCreator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2958">
-          <caret line="93" column="85" selection-start-line="93" selection-start-column="85" selection-end-line="93" selection-end-column="85" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/Request.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.400856" vertical-offset="0" max-vertical-offset="2040">
-          <caret line="101" column="24" selection-start-line="101" selection-start-column="24" selection-end-line="101" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pkrss/gradle.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.04850214" vertical-offset="0" max-vertical-offset="701">
@@ -2351,13 +2347,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/PkRSS.java">
+    <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/Request.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6464471" vertical-offset="2364" max-vertical-offset="10319">
-          <caret line="167" column="44" selection-start-line="167" selection-start-column="44" selection-end-line="167" selection-end-column="44" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1377" max-vertical-offset="2244">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/PkRSS.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="6334" max-vertical-offset="10421">
+          <caret line="395" column="7" selection-start-line="395" selection-start-column="7" selection-end-line="395" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pkrss/src/main/java/com/pkmmte/pkrss/RequestCreator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5677966" vertical-offset="1297" max-vertical-offset="3230">
+          <caret line="104" column="7" selection-start-line="104" selection-start-column="7" selection-end-line="104" selection-end-column="7" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -16,17 +16,19 @@ public final class Request {
 	public final boolean individual;
 	public final boolean skipCache;
 	public final int page;
+	public final CallbackHandler handler;
 	public final Downloader downloader;
 	public final Parser parser;
 	public final Callback callback;
 
-	public Request(String url, String search, boolean individual, boolean skipCache, int page, Downloader downloader, Parser parser, Callback callback) {
+	public Request(String url, String search, boolean individual, boolean skipCache, int page, CallbackHandler handler, Downloader downloader, Parser parser, Callback callback) {
 		this.tag = String.valueOf(ID_GENERATOR.incrementAndGet());
 		this.url = url;
 		this.search = search;
 		this.individual = individual;
 		this.skipCache = skipCache;
 		this.page = page;
+		this.handler = handler;
 		this.downloader = downloader;
 		this.parser = parser;
 		this.callback = callback;
@@ -39,6 +41,7 @@ public final class Request {
 		this.individual = builder.individual;
 		this.skipCache = builder.skipCache;
 		this.page = builder.page;
+		this.handler = builder.handler;
 		this.downloader = builder.downloader;
 		this.parser = builder.parser;
 		this.callback = builder.callback;
@@ -51,6 +54,7 @@ public final class Request {
 		private boolean individual;
 		private boolean skipCache;
 		private int page;
+		private CallbackHandler handler;
 		private Downloader downloader;
 		private Parser parser;
 		private Callback callback;
@@ -62,6 +66,7 @@ public final class Request {
 			this.individual = false;
 			this.skipCache = false;
 			this.page = 1;
+			this.handler = null;
 			this.downloader = null;
 			this.parser = null;
 			this.callback = null;
@@ -94,6 +99,11 @@ public final class Request {
 
 		public Builder page(int page) {
 			this.page = page;
+			return this;
+		}
+
+		public Builder handler(CallbackHandler handler) {
+			this.handler = handler;
 			return this;
 		}
 
