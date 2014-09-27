@@ -32,19 +32,19 @@ public abstract class Parser {
 		this.singleton = singleton;
 	}
 
-	final void log(String message) {
+	public final void log(String message) {
 		log(TAG, message, Log.DEBUG);
 	}
 
-	final void log(String tag, String message) {
+	public final void log(String tag, String message) {
 		log(tag, message, Log.DEBUG);
 	}
 
-	final void log(String message, int type) {
+	public final void log(String message, int type) {
 		log(TAG, message, type);
 	}
 
-	final void log(String tag, String message, int type) {
+	public final void log(String tag, String message, int type) {
 		if(singleton == null || !singleton.isLoggingEnabled())
 			return;
 

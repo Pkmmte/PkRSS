@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -28,12 +29,14 @@ import org.xmlpull.v1.XmlPullParserFactory;
 public class AtomParser extends Parser {
 	private final List<Article> articleList = new ArrayList<Article>();
 	private final DateFormat dateFormat;
+	private final Pattern pattern;
 	private final XmlPullParser xmlParser;
 
 	public AtomParser() {
 		// Initialize DateFormat object with the default date formatting
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
 		dateFormat.setTimeZone(Calendar.getInstance().getTimeZone());
+		pattern = Pattern.compile("-\\d{1,4}x\\d{1,4}");
 
 		// Initialize XmlPullParser object with a common configuration
 		XmlPullParser parser = null;
@@ -195,7 +198,7 @@ public class AtomParser extends Parser {
 					int count = xpp.getAttributeCount();
 					for (int x = 0; x < count; x++) {
 						if (xpp.getAttributeName(x).equalsIgnoreCase("src"))
-							return xpp.getAttributeValue(x).replaceAll("-110x52", "");
+							return pattern.matcher(xpp.getAttributeValue(x)).replaceAll("");
 					}
 				}
 				eventType = xpp.next();
