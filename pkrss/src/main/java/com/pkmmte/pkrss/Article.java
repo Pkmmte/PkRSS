@@ -22,6 +22,7 @@ public class Article implements Parcelable {
 	private String author;
 	private long date;
 	private int id;
+    private Enclosure enclosure;
 
 	public Article() {
 		this.extras = new Bundle();
@@ -35,6 +36,7 @@ public class Article implements Parcelable {
 		this.author = null;
 		this.date = 0;
 		this.id = -1;
+        this.enclosure = null;
 	}
 
 	public Article(Bundle extras, List<String> tags, Uri source, Uri image, String title, String description, String content, String comments, String author, long date, int id) {
@@ -254,6 +256,22 @@ public class Article implements Parcelable {
 		this.comments = comments;
 		return this;
 	}
+
+    /**
+     * @return Enclosure which contains the URL, length, and mime type of the article's enclosure
+     */
+    public Enclosure getEnclosure() {
+        return this.enclosure;
+    }
+
+    /**
+     * Sets the article's enclosure.
+     * @param enclosure Enclosure which contains the URL, length, and mime type
+     */
+    public Article setEnclosure(Enclosure enclosure) {
+        this.enclosure = enclosure;
+        return this;
+    }
 
 	/**
 	 * @return String containing the article's author. May be null.

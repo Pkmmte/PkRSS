@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
 import com.pkmmte.pkrss.Article;
+import com.pkmmte.pkrss.Enclosure;
 import com.pkmmte.pkrss.PkRSS;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -74,6 +75,11 @@ public class Rss2Parser extends Parser {
 					case XmlPullParser.START_TAG:
 						if (tagname.equalsIgnoreCase("item")) // Start a new instance
 							article = new Article();
+                        // Enclosures not readable as text by XmlPullParser in Android and will fail in handleNode, considered not a bug
+                        // https://code.google.com/p/android/issues/detail?id=18658
+                        else if (tagname.equalsIgnoreCase("enclosure")) {
+                            article.setEnclosure(new Enclosure(xmlParser));
+                        }
 						else // Handle this node if not an entry tag
 							handleNode(tagname, article);
 						break;
