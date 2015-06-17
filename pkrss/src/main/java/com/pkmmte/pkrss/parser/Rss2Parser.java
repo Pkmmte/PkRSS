@@ -36,7 +36,7 @@ public class Rss2Parser extends Parser {
 
 	public Rss2Parser() {
 		// Initialize DateFormat object with the default date formatting
-		dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.getDefault());
+		dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.US);
 		dateFormat.setTimeZone(Calendar.getInstance().getTimeZone());
 		pattern = Pattern.compile("-\\d{1,4}x\\d{1,4}");
 
