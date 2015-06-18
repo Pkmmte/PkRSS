@@ -34,7 +34,7 @@ public class AtomParser extends Parser {
 
 	public AtomParser() {
 		// Initialize DateFormat object with the default date formatting
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
 		dateFormat.setTimeZone(Calendar.getInstance().getTimeZone());
 		pattern = Pattern.compile("-\\d{1,4}x\\d{1,4}");
 
