@@ -162,7 +162,7 @@ public class PkRSS {
 		}
 
 		// Notify callback
-		handler.onPreload(safe, request.callback);
+		handler.onPreload(safe, request.callback.get());
 
 		// Create safe url for pagination/indexing purposes
 		String safeUrl = request.downloader == null ? downloader.toSafeUrl(request) : request.downloader.toSafeUrl(request);
@@ -178,7 +178,7 @@ public class PkRSS {
 		insert(safeUrl, newArticles);
 
 		// Notify callback
-		handler.onLoaded(safe, request.callback, newArticles);
+		handler.onLoaded(safe, request.callback.get(), newArticles);
 	}
 
 	/**

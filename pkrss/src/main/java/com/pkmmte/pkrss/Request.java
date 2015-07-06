@@ -2,6 +2,8 @@ package com.pkmmte.pkrss;
 
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.parser.Parser;
+
+import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -20,7 +22,7 @@ public final class Request {
 	public final CallbackHandler handler;
 	public final Downloader downloader;
 	public final Parser parser;
-	public final Callback callback;
+	public final WeakReference<Callback> callback;
 
 	/* Hidden constructor */
 	public Request(Builder builder) {
@@ -48,7 +50,7 @@ public final class Request {
 		private CallbackHandler handler;
 		private Downloader downloader;
 		private Parser parser;
-		private Callback callback;
+		private WeakReference<Callback> callback;
 
 		public Builder(String url) {
 			this.tag = null;
@@ -115,7 +117,7 @@ public final class Request {
 		}
 
 		public Builder callback(Callback callback) {
-			this.callback = callback;
+			this.callback = new WeakReference<>(callback);
 			return this;
 		}
 

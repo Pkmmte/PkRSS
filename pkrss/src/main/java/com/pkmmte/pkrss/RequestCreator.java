@@ -236,7 +236,7 @@ public class RequestCreator {
 						singleton.load(request);
 					} catch (IOException e) {
 						singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
-						handler.onLoadFailed(safe, request.callback);
+						handler.onLoadFailed(safe, request.callback.get());
 					}
 				} catch (InterruptedException e) {
 					singleton.log(request.tag + " thread interrupted!");
