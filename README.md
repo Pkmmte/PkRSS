@@ -52,6 +52,7 @@ ProGuard
 If you are using ProGuard make sure you add the following option:
 
 ```
+-keep class com.pkmmte.pkrss.Callback{ *; }
 -dontwarn com.squareup.okhttp.**
 ```
 
