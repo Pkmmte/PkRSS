@@ -81,8 +81,7 @@ public class PkRSS {
 	 * <p>
 	 * If these settings do not meet the requirements of your application, you can construct your own
 	 * instance with full control over the configuration by using {@link PkRSS.Builder}.
-	 * You may also use {@link PkRSS.Builder#buildSingleton()} to build the singleton or
-	 * {@link PkRSS.Builder#replaceSingleton()} to replace the existing singleton if it differs.
+	 * You may then use it directly or replace the current singleton instance via {@link #setSingleton(PkRSS)}.
 	 */
 	public static PkRSS with(Context context) {
 		if(singleton == null)
@@ -96,6 +95,10 @@ public class PkRSS {
 	 */
 	protected static PkRSS getInstance() {
 		return singleton;
+	}
+
+	public static void setSingleton(PkRSS singleton) {
+		PkRSS.singleton = singleton;
 	}
 
 	PkRSS(Context context, CallbackHandler handler, Downloader downloader, Parser parser, boolean loggingEnabled, boolean safe) {
@@ -479,30 +482,6 @@ public class PkRSS {
 		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		PkRSS pkRSS = (PkRSS) o;
-
-		if (loggingEnabled != pkRSS.loggingEnabled) return false;
-		if (!handler.equals(pkRSS.handler)) return false;
-		if (!downloader.equals(pkRSS.downloader)) return false;
-		if (!parser.equals(pkRSS.parser)) return false;
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = (loggingEnabled ? 1 : 0);
-		result = 31 * result + handler.hashCode();
-		result = 31 * result + downloader.hashCode();
-		result = 31 * result + parser.hashCode();
-		return result;
-	}
-
 	protected final void log(String message) {
 		log(TAG, message, Log.DEBUG);
 	}
@@ -621,35 +600,6 @@ public class PkRSS {
 				handler = new CallbackHandler();
 
 			return new PkRSS(context, handler, downloader, parser, loggingEnabled, safe);
-		}
-
-		/**
-		 * Creates a {@link PkRSS} instance and assigns it to the
-		 * global {@link PkRSS#singleton} instance if it doesn't already exists.
-		 */
-		public void buildSingleton() {
-			if(singleton == null)
-				singleton = build();
-			else
-				Log.e(TAG, "Cannot buildSingleton(), a singleton already exists! Ignoring request...");
-		}
-
-		/**
-		 * <b><i>Use wisely!</i></b>
-		 * <p>
-		 * Creates a {@link PkRSS} instance and replaces the existing
-		 * global {@link PkRSS#singleton} instance if the hash codes differ.
-		 * <p>
-		 * <i>Do NOT use this unless you really have to!</i>
-		 */
-		public void replaceSingleton() {
-			PkRSS newInstance = build();
-			if(singleton == null || !newInstance.equals(singleton)) {
-				singleton = newInstance;
-				Log.d(TAG, "Replaced global singleton instance.");
-			}
-			else
-				Log.e(TAG, "Could not replace singleton instance. Same instance already exists.");
 		}
 	}
 }
