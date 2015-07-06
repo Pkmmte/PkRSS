@@ -495,7 +495,6 @@ public class Article implements Parcelable {
 		dest.writeInt(id);
 	}
 
-	@SuppressWarnings("unused")
 	public static final Creator<Article> CREATOR = new Creator<Article>() {
 		@Override
 		public Article createFromParcel(Parcel in) {

@@ -120,4 +120,16 @@ public class Enclosure implements Parcelable {
         parcel.writeString(length);
         parcel.writeString(mimeType);
     }
+
+    public static final Creator<Enclosure> CREATOR = new Creator<Enclosure>() {
+        @Override
+        public Enclosure createFromParcel(Parcel source) {
+            return new Enclosure(source);
+        }
+
+        @Override
+        public Enclosure[] newArray(int size) {
+            return new Enclosure[size];
+        }
+    };
 }
