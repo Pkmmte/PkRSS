@@ -2,7 +2,6 @@ package com.pkmmte.pkrss;
 
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.parser.Parser;
@@ -17,9 +16,21 @@ public class RequestCreator {
 	private final PkRSS singleton;
 	private final Request.Builder data;
 
+	private long delay = 0;
+
 	protected RequestCreator(PkRSS singleton, String url) {
 		this.singleton = singleton;
 		this.data = new Request.Builder(url);
+	}
+
+	/**
+	 * Time delay before executing this request asynchronously.
+	 * Defaults to 0 for immediate execution.
+	 * @param delay Time in milliseconds.
+	 */
+	public RequestCreator delay(long delay) {
+		this.delay = delay;
+		return this;
 	}
 
 	/**
@@ -178,16 +189,25 @@ public class RequestCreator {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					singleton.load(request);
-				} catch (IOException e) {
-					// Log
-					singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
+					// Delay thread if specified
+					if (delay > 0) {
+						singleton.log("Delaying " + request.tag + " request for " + delay + "ms");
+						Thread.sleep(delay);
+					}
 
-					// Callback
-					if(request.callback != null && request.handler == null)
-						singleton.handler.onLoadFailed(request.callback);
-					else if(request.callback != null)
-						request.handler.onLoadFailed(request.callback);
+					// Execute request
+					try {
+						singleton.load(request);
+					} catch (IOException e) {
+						singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
+
+						if (request.callback != null && request.handler == null)
+							singleton.handler.onLoadFailed(request.callback);
+						else if (request.callback != null)
+							request.handler.onLoadFailed(request.callback);
+					}
+				} catch (InterruptedException e) {
+					singleton.log(request.tag + " thread interrupted!");
 				}
 				return null;
 			}
