@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import com.pkmmte.pkrss.downloader.DefaultDownloader;
@@ -538,12 +539,13 @@ public class PkRSS {
 				throw new IllegalArgumentException("Context must not be null!");
 
 			this.context = context.getApplicationContext();
+			this.handler = new CallbackHandler(new Handler(Looper.getMainLooper()));
 		}
 
 		/**
 		 * Specifies the thread for which to execute callbacks on.
 		 * Setting this to null executes callbacks on the same thread in which the request was called. <br />
-		 * <b>Default: </b> {@code null}
+		 * <b>Default: </b> new Handler(Lopper.getMainLooper())
 		 */
 		public Builder handler(Handler handler) {
 			this.handler = new CallbackHandler(handler);
