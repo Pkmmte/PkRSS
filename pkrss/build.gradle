@@ -1,30 +1,20 @@
 apply plugin: 'com.android.library'
 
 android {
-  compileSdkVersion 20
-  buildToolsVersion "20.0.0"
+  compileSdkVersion 22
+  buildToolsVersion "22.0.1"
 
   defaultConfig {
-    applicationId "com.pkmmte.pkrss"
     minSdkVersion 14
     versionCode Integer.parseInt(project.VERSION_CODE)
     versionName project.VERSION_NAME
-  }
-  buildTypes {
-    release {
-      runProguard false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
-  }
-  lintOptions {
-    abortOnError false
   }
 }
 
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
-  compile group: 'com.squareup.okhttp', name: 'okhttp', version: '2.0.0'
-  compile group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.0.0'
+  compile group: 'com.squareup.okhttp', name: 'okhttp', version: '2.4.0'
+  compile group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.4.0'
 }
 
 task clearJar(type: Delete) {
@@ -40,4 +30,4 @@ task makeJar(type: Copy) {
 
 makeJar.dependsOn(clearJar, build)
 
-apply from: 'https://raw.github.com/Pkmmte/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
