@@ -118,6 +118,16 @@ public class RequestCreator {
 	}
 
 	/**
+	 * Choose whether to handle callbacks safely.
+	 * Setting to true will automatically catch any exceptions thrown.
+	 * @param safe
+	 */
+	public RequestCreator safe(Boolean safe) {
+		this.data.safe(safe);
+		return this;
+	}
+
+	/**
 	 * Assigns a different callback handler to this specific request.
 	 * This is useful for handling this request in a specific thread but leaving the rest
 	 * as before. If you'd like to force the main thread handler, use <b>new Handler(Looper.getMainLooper());</b>
@@ -199,6 +209,8 @@ public class RequestCreator {
 	 */
 	public void async() {
 		final Request request = data.build();
+		final CallbackHandler handler = request.handler != null ? request.handler : singleton.handler;
+		final boolean safe = request.safe != null ? request.safe : singleton.safe;
 
 		// Ignore current request if already running (ignoreIfRunning)
 		synchronized (activeRequests) {
@@ -224,11 +236,7 @@ public class RequestCreator {
 						singleton.load(request);
 					} catch (IOException e) {
 						singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
-
-						if (request.callback != null && request.handler == null)
-							singleton.handler.onLoadFailed(request.callback);
-						else if (request.callback != null)
-							request.handler.onLoadFailed(request.callback);
+						handler.onLoadFailed(safe, request.callback);
 					}
 				} catch (InterruptedException e) {
 					singleton.log(request.tag + " thread interrupted!");

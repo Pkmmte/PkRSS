@@ -46,6 +46,9 @@ public class PkRSS {
 	// Callback Thread Handler
 	protected final CallbackHandler handler;
 
+	// Safely handle callbacks
+	protected final boolean safe;
+
 	// Context is always useful for some reason.
 	private final Context mContext;
 
@@ -95,7 +98,7 @@ public class PkRSS {
 		return singleton;
 	}
 
-	PkRSS(Context context, CallbackHandler handler, Downloader downloader, Parser parser, boolean loggingEnabled) {
+	PkRSS(Context context, CallbackHandler handler, Downloader downloader, Parser parser, boolean loggingEnabled, boolean safe) {
 		this.mContext = context;
 		this.handler = handler;
 		this.downloader = downloader;
@@ -103,6 +106,7 @@ public class PkRSS {
 		this.parser = parser;
 		this.parser.attachInstance(this);
 		this.loggingEnabled = loggingEnabled;
+		this.safe = safe;
 		this.mPrefs = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
 		getRead();
 		favoriteDatabase = new FavoriteDatabase(context);
@@ -144,17 +148,18 @@ public class PkRSS {
 	 * @throws IOException
 	 */
 	protected void load(final Request request) throws IOException {
+		log("load(" + request + ')');
+		final CallbackHandler handler = request.handler != null ? request.handler : this.handler;
+		final boolean safe = request.safe != null ? request.safe : this.safe;
+
 		// Don't load if URL is the favorites key
 		if(request.url.equals(KEY_FAVORITES)) {
 			log("Favorites URL detected, skipping load...");
 			return;
 		}
 
-		// Call the "OnPreload" code, if available
-		if(request.callback != null && request.handler == null)
-			handler.onPreload(request.callback);
-		else if(request.callback != null)
-			request.handler.onPreload(request.callback);
+		// Notify callback
+		handler.onPreload(safe, request.callback);
 
 		// Create safe url for pagination/indexing purposes
 		String safeUrl = request.downloader == null ? downloader.toSafeUrl(request) : request.downloader.toSafeUrl(request);
@@ -169,11 +174,8 @@ public class PkRSS {
 		List<Article> newArticles = request.parser == null ? parser.parse(response) : request.parser.parse(response);
 		insert(safeUrl, newArticles);
 
-		// Call the "OnLoaded" code, if available
-		if(request.callback != null && request.handler == null)
-			handler.onLoaded(request.callback, newArticles);
-		else if(request.callback != null)
-			request.handler.onLoaded(request.callback, newArticles);
+		// Notify callback
+		handler.onLoaded(safe, request.callback, newArticles);
 	}
 
 	/**
@@ -547,6 +549,7 @@ public class PkRSS {
 		private Downloader downloader;
 		private Parser parser;
 		private boolean loggingEnabled;
+		private boolean safe;
 
 		/**
 		 * Start building a new {@link PkRSS} instance.
@@ -554,6 +557,7 @@ public class PkRSS {
 		public Builder(Context context) {
 			if (context == null)
 				throw new IllegalArgumentException("Context must not be null!");
+
 			this.context = context.getApplicationContext();
 		}
 
@@ -595,6 +599,15 @@ public class PkRSS {
 		}
 
 		/**
+		 * Toggle whether or not to automatically catch exceptions from callbacks.
+		 * <b>Default: </b> {@code false}
+		 */
+		public Builder safe(boolean safe) {
+			this.safe = safe;
+			return this;
+		}
+
+		/**
 		 * Creates a {@link PkRSS} instance.
 		 */
 		public PkRSS build() {
@@ -607,7 +620,7 @@ public class PkRSS {
 			if(handler == null)
 				handler = new CallbackHandler();
 
-			return new PkRSS(context, handler, downloader, parser, loggingEnabled);
+			return new PkRSS(context, handler, downloader, parser, loggingEnabled, safe);
 		}
 
 		/**

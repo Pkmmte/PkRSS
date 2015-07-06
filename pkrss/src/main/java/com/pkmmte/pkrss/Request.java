@@ -16,24 +16,13 @@ public final class Request {
 	public final boolean individual;
 	public final boolean skipCache;
 	public final int page;
+	public final Boolean safe;
 	public final CallbackHandler handler;
 	public final Downloader downloader;
 	public final Parser parser;
 	public final Callback callback;
 
-	public Request(String url, String search, boolean individual, boolean skipCache, int page, CallbackHandler handler, Downloader downloader, Parser parser, Callback callback) {
-		this.tag = String.valueOf(ID_GENERATOR.incrementAndGet());
-		this.url = url;
-		this.search = search;
-		this.individual = individual;
-		this.skipCache = skipCache;
-		this.page = page;
-		this.handler = handler;
-		this.downloader = downloader;
-		this.parser = parser;
-		this.callback = callback;
-	}
-
+	/* Hidden constructor */
 	public Request(Builder builder) {
 		this.tag = builder.tag == null ? String.valueOf(ID_GENERATOR.incrementAndGet()) : builder.tag;
 		this.url = builder.url;
@@ -41,19 +30,21 @@ public final class Request {
 		this.individual = builder.individual;
 		this.skipCache = builder.skipCache;
 		this.page = builder.page;
+		this.safe = builder.safe;
 		this.handler = builder.handler;
 		this.downloader = builder.downloader;
 		this.parser = builder.parser;
 		this.callback = builder.callback;
 	}
 
-	public static final class Builder {
+	public static class Builder {
 		private String tag;
 		private String url;
 		private String search;
 		private boolean individual;
 		private boolean skipCache;
 		private int page;
+		private Boolean safe;
 		private CallbackHandler handler;
 		private Downloader downloader;
 		private Parser parser;
@@ -66,6 +57,7 @@ public final class Request {
 			this.individual = false;
 			this.skipCache = false;
 			this.page = 1;
+			this.safe = null;
 			this.handler = null;
 			this.downloader = null;
 			this.parser = null;
@@ -99,6 +91,11 @@ public final class Request {
 
 		public Builder page(int page) {
 			this.page = page;
+			return this;
+		}
+
+		public Builder safe(boolean safe) {
+			this.safe = safe;
 			return this;
 		}
 
