@@ -6,6 +6,8 @@ import android.util.Log;
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.parser.Parser;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +15,13 @@ import java.util.Map;
  * Fluent API for building an RSS load request.
  */
 public class RequestCreator {
+	private static final List<String> activeRequests = Collections.synchronizedList(new ArrayList<String>());
+
 	private final PkRSS singleton;
 	private final Request.Builder data;
 
 	private long delay = 0;
+	private boolean ignoreIfRunning = false;
 
 	protected RequestCreator(PkRSS singleton, String url) {
 		this.singleton = singleton;
@@ -30,6 +35,16 @@ public class RequestCreator {
 	 */
 	public RequestCreator delay(long delay) {
 		this.delay = delay;
+		return this;
+	}
+
+	/**
+	 * Indicate whether or not to ignore this request if another
+	 * request with the same .tag() is already running.
+	 * @param ignoreIfRunning
+	 */
+	public RequestCreator ignoreIfRunning(boolean ignoreIfRunning) {
+		this.ignoreIfRunning = ignoreIfRunning;
 		return this;
 	}
 
@@ -185,6 +200,15 @@ public class RequestCreator {
 	public void async() {
 		final Request request = data.build();
 
+		// Ignore current request if already running (ignoreIfRunning)
+		synchronized (activeRequests) {
+			if (ignoreIfRunning && activeRequests.contains(request.tag)) {
+				singleton.log(request.tag + " request already running! Ignoring...");
+				return;
+			}
+			activeRequests.add(request.tag);
+		}
+
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
@@ -208,8 +232,22 @@ public class RequestCreator {
 					}
 				} catch (InterruptedException e) {
 					singleton.log(request.tag + " thread interrupted!");
+				} finally {
+					synchronized (activeRequests) {
+						activeRequests.remove(request.tag);
+					}
 				}
 				return null;
+			}
+
+			@Override
+			protected void onCancelled(Void aVoid) {
+				super.onCancelled(aVoid);
+
+				// Double check to make sure this request is removed
+				synchronized (activeRequests) {
+					activeRequests.remove(request.tag);
+				}
 			}
 		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 	}
