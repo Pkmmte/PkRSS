@@ -74,26 +74,29 @@ public class DefaultDownloader extends Downloader {
 		connection.connect();
 
 		// Read stream
-		InputStream stream = null;
+		InputStreamReader streamReader = null;
+		BufferedReader bufferedReader = null;
 		try {
-			// I really don't feel comfortable using InputStreams...
-			stream = new BufferedInputStream(url.openStream(), 8192);
-			int ch;
-			StringBuffer builder = new StringBuffer();
-			while ((ch = stream.read()) != -1) {
-				builder.append((char) ch);
+			streamReader = new InputStreamReader(url.openStream(), "UTF-8");
+			bufferedReader = new BufferedReader(streamReader);
+			StringBuilder sb = new StringBuilder();
+			String readLine;
+			while ((readLine = bufferedReader.readLine()) != null) {
+				sb.append(readLine);
 			}
 
-			// Convert stream to a string
-			responseStr = builder.toString();
+			responseStr = sb.toString();
 			log(TAG, "Request download took " + (System.currentTimeMillis() - time) + "ms", Log.INFO);
 		} catch (Exception e) {
 			log("Error executing/reading http request!", Log.ERROR);
 			e.printStackTrace();
 			throw new IOException(e.getMessage());
 		} finally {
-			if (stream != null)
-				stream.close();
+			if (bufferedReader != null)
+				bufferedReader.close();
+			if (streamReader != null)
+				streamReader.close();
+			
 			connection.disconnect();
 		}
 
