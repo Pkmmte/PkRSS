@@ -13,8 +13,7 @@ android {
 
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
-  compile group: 'com.squareup.okhttp', name: 'okhttp', version: '2.4.0'
-  compile group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.4.0'
+  compile group: 'com.squareup.okhttp', name: 'okhttp', version: '2.5.0'
 }
 
 task clearJar(type: Delete) {
