@@ -8,16 +8,16 @@ For more information, please see [the website][1]
 Download
 --------
 
-Download [the latest JAR][2] or grab via Gradle:
+Download the latest JAR from the [release page][2] or grab via Gradle:
 ```groovy
-compile 'com.pkmmte.pkrss:pkrss:1.1.2'
+compile 'com.pkmmte.pkrss:pkrss:1.2'
 ```
 or Maven:
 ```xml
 <dependency>
     <groupId>com.pkmmte.pkrss</groupId>
     <artifactId>pkrss</artifactId>
-    <version>1.1.2</version>
+    <version>1.2</version>
 </dependency>
 ```
 
@@ -88,6 +88,6 @@ License
     limitations under the License.
 
  [1]: http://pkmmte.github.io/PkRSS/
- [2]: https://github.com/Pkmmte/PkRSS/releases/download/v1.1.2/pkrss-1.1.2.jar
+ [2]: https://github.com/Pkmmte/PkRSS/releases
  [3]: https://github.com/Pkmmte/TechDissected
  [4]: http://pkmmte.github.io/PkRSS/javadoc/
