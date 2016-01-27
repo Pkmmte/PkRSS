@@ -3,6 +3,7 @@ package com.pkmmte.pkrss.parser;
 import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
+
 import com.pkmmte.pkrss.Article;
 import com.pkmmte.pkrss.Enclosure;
 import com.pkmmte.pkrss.PkRSS;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -79,8 +79,9 @@ public class Rss2Parser extends Parser {
                         // https://code.google.com/p/android/issues/detail?id=18658
                         else if (tagname.equalsIgnoreCase("enclosure")) {
                             article.setEnclosure(new Enclosure(xmlParser));
-                        }
-						else // Handle this node if not an entry tag
+                        } else if (tagname.equalsIgnoreCase("media:content")) {
+							handleMediaContent(tagname, article);
+						} else // Handle this node if not an entry tag
 							handleNode(tagname, article);
 						break;
 					case XmlPullParser.END_TAG:
@@ -161,6 +162,75 @@ public class Rss2Parser extends Parser {
 		catch (XmlPullParserException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	/**
+	 * Parses the media content of the entry
+	 * @param tag The tag which to handle.
+	 * @param article Article object to assign the node value to.
+	 */
+	private void handleMediaContent(String tag, Article article) {
+		String url = xmlParser.getAttributeValue(null, "url");
+		if(url == null) {
+			throw new IllegalArgumentException("Url argument must not be null");
+		}
+
+		Article.MediaContent mc = new Article.MediaContent();
+		article.addMediaContent(mc);
+		mc.setUrl(url);
+
+		if(xmlParser.getAttributeValue(null, "type") != null) {
+			mc.setType(xmlParser.getAttributeValue(null, "type"));
+		}
+
+		if(xmlParser.getAttributeValue(null, "fileSize") != null) {
+			mc.setFileSize(Integer.parseInt(xmlParser.getAttributeValue(null, "fileSize")));
+		}
+
+
+		if(xmlParser.getAttributeValue(null, "medium") != null) {
+			mc.setMedium(xmlParser.getAttributeValue(null, "medium"));
+		}
+
+		if(xmlParser.getAttributeValue(null, "isDefault") != null) {
+			mc.setIsDefault(Boolean.parseBoolean(xmlParser.getAttributeValue(null, "isDefault")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "expression") != null) {
+			mc.setExpression(xmlParser.getAttributeValue(null, "expression"));
+		}
+
+		if(xmlParser.getAttributeValue(null, "bitrate") != null) {
+			mc.setBitrate(Integer.parseInt(xmlParser.getAttributeValue(null, "bitrate")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "framerate") != null) {
+			mc.setFramerate(Integer.parseInt(xmlParser.getAttributeValue(null, "framerate")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "samplingrate") != null) {
+			mc.setSamplingrate(Integer.parseInt(xmlParser.getAttributeValue(null, "samplingrate")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "channels") != null) {
+			mc.setChannels(Integer.parseInt(xmlParser.getAttributeValue(null, "channels")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "duration") != null) {
+			mc.setDuration(Integer.parseInt(xmlParser.getAttributeValue(null, "duration")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "height") != null) {
+			mc.setHeight(Integer.parseInt(xmlParser.getAttributeValue(null, "height")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "width") != null) {
+			mc.setWidth(Integer.parseInt(xmlParser.getAttributeValue(null, "width")));
+		}
+
+		if(xmlParser.getAttributeValue(null, "lang") != null) {
+			mc.setLang(xmlParser.getAttributeValue(null, "lang"));
 		}
 	}
 
