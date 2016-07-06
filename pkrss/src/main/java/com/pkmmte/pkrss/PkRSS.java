@@ -155,6 +155,7 @@ public class PkRSS {
 		log("load(" + request + ')');
 		final CallbackHandler handler = request.handler != null ? request.handler : this.handler;
 		final boolean safe = request.safe != null ? request.safe : this.safe;
+		Callback callback = request.callback != null ? request.callback.get() : null;
 
 		// Don't load if URL is the favorites key
 		if(request.url.equals(KEY_FAVORITES)) {
@@ -163,7 +164,7 @@ public class PkRSS {
 		}
 
 		// Notify callback
-		handler.onPreload(safe, request.callback.get());
+		handler.onPreload(safe, callback);
 
 		// Create safe url for pagination/indexing purposes
 		String safeUrl = request.downloader == null ? downloader.toSafeUrl(request) : request.downloader.toSafeUrl(request);
@@ -179,7 +180,7 @@ public class PkRSS {
 		insert(safeUrl, newArticles);
 
 		// Notify callback
-		handler.onLoaded(safe, request.callback.get(), newArticles);
+		handler.onLoaded(safe, callback, newArticles);
 	}
 
 	/**
