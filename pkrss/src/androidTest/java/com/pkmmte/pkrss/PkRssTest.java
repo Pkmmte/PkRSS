@@ -3,7 +3,6 @@ package com.pkmmte.pkrss;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.AndroidTestCase;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -40,18 +39,18 @@ public class PkRssTest extends AndroidTestCase {
             Callback callback = new Callback() {
 
                 @Override
-                public void OnPreLoad() {
+                public void onPreload() {
                     // do nothing
                 }
 
                 @Override
-                public void OnLoaded(List<Article> newArticles) {
+                public void onLoaded(List<Article> newArticles) {
                     articles.addAll(newArticles);
                     lock.countDown();
                 }
 
                 @Override
-                public void OnLoadFailed() {
+                public void onLoadFailed() {
                     lock.countDown();
                     fail();
                 }
@@ -66,8 +65,4 @@ public class PkRssTest extends AndroidTestCase {
         }
     }
 
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
 }
