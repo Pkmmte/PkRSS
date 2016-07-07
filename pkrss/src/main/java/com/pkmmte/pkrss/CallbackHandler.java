@@ -23,17 +23,17 @@ class CallbackHandler {
 	}
 
 	protected void onPreload(final boolean safe, final Callback callback) {
-		Method method = getDeclaredMethod(clazz, "OnPreLoad");
+		Method method = getDeclaredMethod(clazz, "onPreload");
 		invokeCallback(method, callback, safe);
 	}
 
 	protected void onLoaded(final boolean safe, final Callback callback, final List<Article> newArticles) {
-		Method method = getDeclaredMethod(clazz, "OnLoaded", List.class);
+		Method method = getDeclaredMethod(clazz, "onLoaded", List.class);
 		invokeCallback(method, callback, safe, newArticles);
 	}
 
 	protected void onLoadFailed(boolean safe, Callback callback) {
-		Method method = getDeclaredMethod(clazz, "OnLoadFailed");
+		Method method = getDeclaredMethod(clazz, "onLoadFailed");
 		invokeCallback(method, callback, safe);
 	}
 
