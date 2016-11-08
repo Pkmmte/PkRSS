@@ -38,38 +38,19 @@ public class Utils {
 	public static Downloader createDefaultDownloader(Context context) {
 		Downloader downloaderInstance = null;
 
-		boolean okUrlFactory = false;
-		try {
-			Class.forName("com.squareup.okhttp.OkUrlFactory");
-			okUrlFactory = true;
-			downloaderInstance = new DefaultDownloader(context);
-		} catch (ClassNotFoundException ignored) {}
-
-		boolean okHttpClient = false;
 		try {
 			Class.forName("com.squareup.okhttp.OkHttpClient");
-			okHttpClient = true;
 			downloaderInstance = new OkHttpDownloader(context);
 		} catch (ClassNotFoundException ignored) {}
 
 
-		boolean okHttp3Client = false;
 		try {
 			Class.forName("okhttp3.OkHttpClient");
-			okHttp3Client = true;
 			downloaderInstance = new OkHttp3Downloader(context);
 		} catch (ClassNotFoundException ignored) {}
 
-
-
-		if (!okHttpClient && !okHttp3Client && !okUrlFactory) {
-			throw new RuntimeException(""
-					+ "PkRSS detected an unsupported OkHttp on the classpath.\n"
-					+ "To use OkHttp with this version of PkRSS, you'll need:\n"
-					+ "1. com.squareup.okhttp:okhttp:1.6.0 (or newer)\n"
-					+ "2. com.squareup.okhttp3:3.1.2 (or newer)\n"
-					+ "3. com.squareup.okhttp:okhttp-urlconnection:1.6.0 (or newer)\n"
-					+ "Note that OkHttp 2.0.0+ and 3.1.2+ are supported!");
+		if (downloaderInstance == null) {
+			downloaderInstance = new DefaultDownloader(context);
 		}
 
 		Log.d(TAG, "Downloader is " + downloaderInstance);
