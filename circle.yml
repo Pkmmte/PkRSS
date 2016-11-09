@@ -1,0 +1,17 @@
+machine:
+    java:
+        version: oraclejdk8
+
+dependencies:
+    pre:
+        - echo y | android update sdk --no-ui --all --filter "tools"
+        - echo y | android update sdk --no-ui --all --filter "platform-tools"
+        - echo y | android update sdk --no-ui --all --filter "build-tools"
+        - echo y | android update sdk --no-ui --all --filter "build-tools-22.0.1"
+        - echo y | android update sdk --no-ui --all --filter "android-22"
+        - echo y | android update sdk --no-ui --all --filter "extra-android-support"
+        - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"
+
+test:
+    override:
+        - ./gradlew assembleDebug
