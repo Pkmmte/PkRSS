@@ -11,6 +11,10 @@ dependencies:
         - echo y | android update sdk --no-ui --all --filter "android-22"
         - echo y | android update sdk --no-ui --all --filter "extra-android-support"
         - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"
+    post: # Avoids invoking maven command (See https://circleci.com/docs/configuration/#dependencies)
+        - echo $HOME
+    override: # Avoids invoking maven command (See https://circleci.com/docs/configuration/#dependencies)
+        - echo $HOME
 
 test:
     override:
