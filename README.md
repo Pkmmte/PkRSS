@@ -1,4 +1,4 @@
-PkRSS
+PkRSS [![Build Status](https://travis-ci.org/Pkmmte/PkRSS.svg?branch=master)](https://travis-ci.org/Pkmmte/PkRSS)
 =====
 
 A fluent and flexible RSS feed manager for Android
