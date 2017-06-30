@@ -1,1 +1,1 @@
-include ':pkrss'
+include ':pkrss', ':example'
