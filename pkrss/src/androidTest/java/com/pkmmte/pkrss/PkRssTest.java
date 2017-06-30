@@ -3,6 +3,8 @@ package com.pkmmte.pkrss;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.AndroidTestCase;
 
+import com.pkmmte.pkrss.model.Article;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

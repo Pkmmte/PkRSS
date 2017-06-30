@@ -4,8 +4,8 @@ import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
 
-import com.pkmmte.pkrss.Article;
-import com.pkmmte.pkrss.Enclosure;
+import com.pkmmte.pkrss.model.Article;
+import com.pkmmte.pkrss.model.Enclosure;
 import com.pkmmte.pkrss.PkRSS;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

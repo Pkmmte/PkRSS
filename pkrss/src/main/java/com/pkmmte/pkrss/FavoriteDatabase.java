@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.pkmmte.pkrss.model.Article;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

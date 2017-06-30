@@ -2,6 +2,8 @@ package com.pkmmte.pkrss;
 
 import android.os.Handler;
 
+import com.pkmmte.pkrss.model.Article;
+
 import java.lang.reflect.Method;
 import java.util.List;
 

@@ -1,5 +1,7 @@
 package com.pkmmte.pkrss;
 
+import com.pkmmte.pkrss.model.Article;
+
 import java.util.List;
 
 public interface Callback {

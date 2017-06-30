@@ -1,9 +1,12 @@
-package com.pkmmte.pkrss;
+package com.pkmmte.pkrss.model;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.pkmmte.pkrss.PkRSS;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -385,16 +388,16 @@ public class Article implements Parcelable {
 	 * @return {@code true} if this article's id has been marked as read,
 	 * {@code false} if otherwise or instance has not yet been created.
 	 */
-	public boolean isRead() {
-		return PkRSS.getInstance() == null ? false : PkRSS.getInstance().isRead(id);
+	public boolean isRead(Context context) {
+		return PkRSS.with(context).isRead(id);
 	}
 
 	/**
 	 * Adds this article's id to the read index.
 	 * @return {@code true} if successful, {@code false} if otherwise.
 	 */
-	public boolean markRead() {
-		return markRead(true);
+	public boolean markRead(Context context) {
+		return markRead(context, true);
 	}
 
 	/**
@@ -402,10 +405,8 @@ public class Article implements Parcelable {
 	 * @param read Whether or not to mark it as read.
 	 * @return {@code true} if successful, {@code false} if otherwise.
 	 */
-	public boolean markRead(boolean read) {
-		if (PkRSS.getInstance() == null) return false;
-
-		PkRSS.getInstance().markRead(id, read);
+	public boolean markRead(Context context, boolean read) {
+		PkRSS.with(context).markRead(id, read);
 		return true;
 	}
 
@@ -414,16 +415,16 @@ public class Article implements Parcelable {
 	 * @return {@code true} if this article is in the favorites database,
 	 * {@code false} if otherwise, instance has not yet been created, or an error occurred.
 	 */
-	public boolean isFavorite() {
-		return PkRSS.getInstance() == null ? false : PkRSS.getInstance().containsFavorite(id);
+	public boolean isFavorite(Context context) {
+		return PkRSS.with(context).containsFavorite(id);
 	}
 
 	/**
 	 * Adds this article into the favorites database.
 	 * @return {@code true} if successful, {@code false} if otherwise.
 	 */
-	public boolean saveFavorite() {
-		return saveFavorite(true);
+	public boolean saveFavorite(Context context) {
+		return saveFavorite(context, true);
 	}
 
 	/**
@@ -431,10 +432,8 @@ public class Article implements Parcelable {
 	 * @param favorite Whether to add it or remove it.
 	 * @return {@code true} if successful, {@code false} if otherwise.
 	 */
-	public boolean saveFavorite(boolean favorite) {
-		if (PkRSS.getInstance() == null) return false;
-
-		return PkRSS.getInstance().saveFavorite(this, favorite);
+	public boolean saveFavorite(Context context, boolean favorite) {
+		return PkRSS.with(context).saveFavorite(this, favorite);
 	}
 
 	/**

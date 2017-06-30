@@ -1,7 +1,7 @@
 package com.pkmmte.pkrss.parser;
 
 import android.util.Log;
-import com.pkmmte.pkrss.Article;
+import com.pkmmte.pkrss.model.Article;
 import com.pkmmte.pkrss.PkRSS;
 import java.util.List;
 

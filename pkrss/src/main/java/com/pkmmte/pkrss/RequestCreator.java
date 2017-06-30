@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import com.pkmmte.pkrss.downloader.Downloader;
+import com.pkmmte.pkrss.model.Article;
 import com.pkmmte.pkrss.parser.Parser;
 import java.io.IOException;
 import java.util.ArrayList;

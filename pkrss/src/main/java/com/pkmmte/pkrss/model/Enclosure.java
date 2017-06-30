@@ -1,4 +1,4 @@
-package com.pkmmte.pkrss;
+package com.pkmmte.pkrss.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

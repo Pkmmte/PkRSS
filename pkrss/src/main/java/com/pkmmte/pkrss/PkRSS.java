@@ -11,6 +11,7 @@ import android.util.SparseBooleanArray;
 import com.pkmmte.pkrss.downloader.DefaultDownloader;
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.downloader.OkHttpDownloader;
+import com.pkmmte.pkrss.model.Article;
 import com.pkmmte.pkrss.parser.Parser;
 import com.pkmmte.pkrss.parser.Rss2Parser;
 import java.io.IOException;
@@ -50,9 +51,6 @@ public class PkRSS {
 	// Safely handle callbacks
 	protected final boolean safe;
 
-	// Context is always useful for some reason.
-	private final Context mContext;
-
 	// For storing & reading read data
 	private final SharedPreferences mPrefs;
 
@@ -90,20 +88,11 @@ public class PkRSS {
 		return singleton;
 	}
 
-	/**
-	 * Returns the global singleton instance. It may be null so use wisely!
-	 * @return Global singleton instance. May be null.
-	 */
-	protected static PkRSS getInstance() {
-		return singleton;
-	}
-
 	public static void setSingleton(PkRSS singleton) {
 		PkRSS.singleton = singleton;
 	}
 
 	PkRSS(Context context, CallbackHandler handler, Downloader downloader, Parser parser, boolean loggingEnabled, boolean safe) {
-		this.mContext = context;
 		this.handler = handler;
 		this.downloader = downloader;
 		this.downloader.attachInstance(this);
