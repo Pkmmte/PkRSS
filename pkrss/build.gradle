@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
   compileSdkVersion 24
@@ -15,12 +16,11 @@ dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
   compile group: 'com.squareup.okhttp', name: 'okhttp', version: '2.5.0'
   compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.2.0'
-  compile group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.5.0'
 
-  androidTestCompile 'com.android.support.test:runner:0.4'
-  androidTestCompile 'com.android.support.test:rules:0.4'
-  androidTestCompile 'com.squareup.okhttp:okhttp:2.5.0'
-  androidTestCompile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
+  // Kotlin language
+  compile("org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version") {
+    exclude group: 'org.jetbrains', module: 'annotations'
+  }
 }
 
 task clearJar(type: Delete) {
@@ -36,4 +36,4 @@ task makeJar(type: Copy) {
 
 makeJar.dependsOn(clearJar, build)
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+//apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
