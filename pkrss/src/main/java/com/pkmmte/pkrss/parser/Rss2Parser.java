@@ -7,6 +7,8 @@ import android.util.Log;
 import com.pkmmte.pkrss.model.Article;
 import com.pkmmte.pkrss.model.Enclosure;
 import com.pkmmte.pkrss.PkRSS;
+import com.pkmmte.pkrss.model.MediaContent;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -176,7 +178,7 @@ public class Rss2Parser extends Parser {
 			throw new IllegalArgumentException("Url argument must not be null");
 		}
 
-		Article.MediaContent mc = new Article.MediaContent();
+		MediaContent mc = new MediaContent();
 		article.addMediaContent(mc);
 		mc.setUrl(url);
 

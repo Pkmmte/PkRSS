@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.pkmmte.pkrss.model.Article;
+import com.pkmmte.pkrss.model.MediaContent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +91,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 		// Build Content Values
 		ContentValues values = new ContentValues();
 		values.put(KEY_TAGS, TextUtils.join("_PCX_", article.getTags()));
-		values.put(KEY_MEDIA_CONTENT, Article.MediaContent.toByteArray(article.getMediaContent()));
+		values.put(KEY_MEDIA_CONTENT, MediaContent.toByteArray(article.getMediaContent()));
 		values.put(KEY_SOURCE, article.getSource().toString());
 		values.put(KEY_IMAGE, article.getImage().toString());
 		values.put(KEY_TITLE, article.getTitle());
@@ -124,7 +125,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 			// Attempt to retrieve article
 			if (cursor != null) {
 				cursor.moveToFirst();
-				article = new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), Article.MediaContent.fromByteArray(cursor.getBlob(1)), Uri.parse(cursor.getString(2)),
+				article = new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), MediaContent.fromByteArray(cursor.getBlob(1)), Uri.parse(cursor.getString(2)),
 				                      Uri.parse(cursor.getString(3)), cursor.getString(4), cursor.getString(5), cursor.getString(6),
 				                      cursor.getString(7), cursor.getString(8), cursor.getLong(9), cursor.getInt(10));
 			}
@@ -153,7 +154,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 		// Read the query backwards
 		if (cursor.moveToLast()) {
 			do {
-				articleList.add(new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), Article.MediaContent.fromByteArray(cursor.getBlob(1)), Uri.parse(cursor.getString(2)),
+				articleList.add(new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), MediaContent.fromByteArray(cursor.getBlob(1)), Uri.parse(cursor.getString(2)),
 				                            Uri.parse(cursor.getString(3)), cursor.getString(4), cursor.getString(5), cursor.getString(6),
 				                            cursor.getString(7), cursor.getString(8), cursor.getLong(9), cursor.getInt(10)));
 			} while (cursor.moveToPrevious());
