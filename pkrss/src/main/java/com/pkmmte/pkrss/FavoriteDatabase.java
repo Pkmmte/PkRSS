@@ -125,8 +125,8 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 			// Attempt to retrieve article
 			if (cursor != null) {
 				cursor.moveToFirst();
-				item = new RssItem(cursor.getLong(10), cursor.getString(4), Uri.parse(cursor.getString(3)), cursor.getString(5), cursor.getLong(9), cursor.getString(6),
-						cursor.getString(8), Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(2)),
+				item = new RssItem(cursor.getLong(10), cursor.getString(4), cursor.getString(3), cursor.getString(5), cursor.getLong(9), cursor.getString(6),
+						cursor.getString(8), Arrays.asList(cursor.getString(0).split("_PCX_")), cursor.getString(2),
 						MediaContent.fromByteArray(cursor.getBlob(1)), null, cursor.getString(7));
 			}
 		} finally {
@@ -154,8 +154,8 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 		// Read the query backwards
 		if (cursor.moveToLast()) {
 			do {
-				articleList.add(new RssItem(cursor.getLong(10), cursor.getString(4), Uri.parse(cursor.getString(3)), cursor.getString(5), cursor.getLong(9), cursor.getString(6),
-								cursor.getString(8), Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(2)),
+				articleList.add(new RssItem(cursor.getLong(10), cursor.getString(4), cursor.getString(3), cursor.getString(5), cursor.getLong(9), cursor.getString(6),
+								cursor.getString(8), Arrays.asList(cursor.getString(0).split("_PCX_")), cursor.getString(2),
 								MediaContent.fromByteArray(cursor.getBlob(1)), null, cursor.getString(7)));
 			} while (cursor.moveToPrevious());
 		}

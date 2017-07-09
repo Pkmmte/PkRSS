@@ -1,6 +1,5 @@
 package com.pkmmte.pkrss.model
 
-import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import java.io.Serializable
@@ -16,7 +15,7 @@ data class RssItem(
 
 		// Primary data
 		val title: String,
-		val image: Uri? = null,
+		val image: String? = null,
 		val description: String? = null,
 		val date: Long? = 0,
 		val content: String? = null,
@@ -24,7 +23,7 @@ data class RssItem(
 
         // Secondary data
 		val tags: List<String>? = ArrayList(),
-		val source: Uri? = null,
+		val source: String? = null,
 		val mediaContent: List<MediaContent>? = null,
 		val enclosure: Enclosure? = null,
 		val comments: String? = null
@@ -49,13 +48,13 @@ data class RssItem(
 	constructor(parcel: Parcel) : this(
 			parcel.readLong(),
 			parcel.readString(),
-			parcel.readParcelable(Uri::class.java.classLoader),
+			parcel.readString(),
 			parcel.readString(),
 			parcel.readValue(Long::class.java.classLoader) as? Long,
 			parcel.readString(),
 			parcel.readString(),
 			parcel.createStringArrayList(),
-			parcel.readParcelable(Uri::class.java.classLoader),
+			parcel.readString(),
 			parcel.createTypedArrayList(MediaContent.CREATOR),
 			parcel.readParcelable(Enclosure::class.java.classLoader),
 			parcel.readString())
@@ -63,13 +62,13 @@ data class RssItem(
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
 		parcel.writeLong(id)
 		parcel.writeString(title)
-		parcel.writeParcelable(image, flags)
+		parcel.writeString(image)
 		parcel.writeString(description)
 		parcel.writeValue(date)
 		parcel.writeString(content)
 		parcel.writeString(author)
 		parcel.writeStringList(tags)
-		parcel.writeParcelable(source, flags)
+		parcel.writeString(source)
 		parcel.writeTypedList(mediaContent)
 		parcel.writeParcelable(enclosure, flags)
 		parcel.writeString(comments)

@@ -1,6 +1,5 @@
 package com.pkmmte.pkrss.parser
 
-import android.net.Uri
 import android.text.Html
 import android.util.Log
 import com.pkmmte.pkrss.PkRSS
@@ -115,7 +114,7 @@ class AtomParser : Parser() {
 			else if (tag.equals("link", ignoreCase = true)) {
 				val rel = xmlParser.getAttributeValue(null, "rel")
 				if (rel.equals("alternate", ignoreCase = true))
-					item.source = Uri.parse(xmlParser.getAttributeValue(null, "href"))
+					item.source = xmlParser.getAttributeValue(null, "href")
 				else if (rel.equals("replies", ignoreCase = true))
 					item.comments = xmlParser.getAttributeValue(null, "href")
 			}
@@ -127,7 +126,7 @@ class AtomParser : Parser() {
 				item.title = xmlParser.text
 			else if (tag.equals("summary", ignoreCase = true)) {
 				val encoded = xmlParser.text
-				item.image = Uri.parse(pullImageLink(encoded))
+				item.image = pullImageLink(encoded)
 				item.description = Html.fromHtml(encoded.replace("<img.+?>".toRegex(), "")).toString()
 			} else if (tag.equals("content", ignoreCase = true))
 				item.content = xmlParser.text.replace("[<](/)?div[^>]*[>]".toRegex(), "")
@@ -175,19 +174,19 @@ class AtomParser : Parser() {
 	 * @return The first image URL found on the encoded String. May return an
 	 * * empty String if none were found.
 	 */
-	private fun pullImageLink(encoded: String): String {
+	private fun pullImageLink(encoded: String): String? {
 		try {
 			val factory = XmlPullParserFactory.newInstance()
 			val xpp = factory.newPullParser()
-
 			xpp.setInput(StringReader(encoded))
+
 			var eventType = xpp.eventType
 			while (eventType != XmlPullParser.END_DOCUMENT) {
 				if (eventType == XmlPullParser.START_TAG && "img" == xpp.name) {
-					val count = xpp.attributeCount
-					for (x in 0..count - 1) {
-						if (xpp.getAttributeName(x).equals("src", ignoreCase = true))
+					for (x in 0..xpp.attributeCount - 1) {
+						if (xpp.getAttributeName(x).equals("src", ignoreCase = true)) {
 							return pattern.matcher(xpp.getAttributeValue(x)).replaceAll("")
+						}
 					}
 				}
 				eventType = xpp.next()
@@ -196,6 +195,6 @@ class AtomParser : Parser() {
 			log(TAG, "Error pulling image link from description!\n" + e.message, Log.WARN)
 		}
 
-		return ""
+		return null
 	}
 }

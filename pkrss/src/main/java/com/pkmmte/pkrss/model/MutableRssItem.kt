@@ -17,7 +17,7 @@ data class MutableRssItem(
 
 		// Primary data
 		var title: String,
-		var image: Uri? = null,
+		var image: String? = null,
 		var description: String? = null,
 		var date: Long? = 0,
 		var content: String? = null,
@@ -25,7 +25,7 @@ data class MutableRssItem(
 
 		// Secondary data
 		var tags: ArrayList<String>? = ArrayList(),
-		var source: Uri? = null,
+		var source: String? = null,
 		var mediaContent: ArrayList<MediaContent>? = ArrayList(),
 		var enclosure: Enclosure? = null,
 		var comments: String? = null
@@ -50,13 +50,13 @@ data class MutableRssItem(
 	constructor(parcel: Parcel) : this(
 			parcel.readLong(),
 			parcel.readString(),
-			parcel.readParcelable(Uri::class.java.classLoader),
+			parcel.readString(),
 			parcel.readString(),
 			parcel.readValue(Long::class.java.classLoader) as? Long,
 			parcel.readString(),
 			parcel.readString(),
 			parcel.createStringArrayList(),
-			parcel.readParcelable(Uri::class.java.classLoader),
+			parcel.readString(),
 			parcel.createTypedArrayList(MediaContent.CREATOR),
 			parcel.readParcelable(Enclosure::class.java.classLoader),
 			parcel.readString())
@@ -64,13 +64,13 @@ data class MutableRssItem(
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
 		parcel.writeLong(id)
 		parcel.writeString(title)
-		parcel.writeParcelable(image, flags)
+		parcel.writeString(image)
 		parcel.writeString(description)
 		parcel.writeValue(date)
 		parcel.writeString(content)
 		parcel.writeString(author)
 		parcel.writeStringList(tags)
-		parcel.writeParcelable(source, flags)
+		parcel.writeString(source)
 		parcel.writeTypedList(mediaContent)
 		parcel.writeParcelable(enclosure, flags)
 		parcel.writeString(comments)
