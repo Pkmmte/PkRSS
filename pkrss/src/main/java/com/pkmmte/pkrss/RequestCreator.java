@@ -1,7 +1,6 @@
 package com.pkmmte.pkrss;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.model.RssItem;
@@ -119,27 +118,6 @@ public class RequestCreator {
 	}
 
 	/**
-	 * Choose whether to handle callbacks safely.
-	 * Setting to true will automatically catch any exceptions thrown.
-	 * @param safe
-	 */
-	public RequestCreator safe(Boolean safe) {
-		this.data.safe(safe);
-		return this;
-	}
-
-	/**
-	 * Assigns a different callback handler to this specific request.
-	 * This is useful for handling this request in a specific thread but leaving the rest
-	 * as before. If you'd like to force the main thread handler, use <b>new Handler(Looper.getMainLooper());</b>
-	 * @param handler Handler thread in which to run the callback for this request.
-	 */
-	public RequestCreator handler(Handler handler) {
-		this.data.handler(new CallbackHandler(handler));
-		return this;
-	}
-
-	/**
 	 * Assigns a different downloader to handle this specific request.
 	 * This may be useful under certain rare conditions or for miscellaneous purposes.
 	 * @param downloader Custom downloader which to override the set downloader
@@ -166,7 +144,15 @@ public class RequestCreator {
 	 * @param callback Callback interface to respond to.
 	 */
 	public RequestCreator callback(Callback callback) {
-		this.data.callback(callback);
+		return callback(callback, AdaptiveReference.Type.WEAK);
+	}
+
+	/**
+	 * Adds a callback listener to this request.
+	 * @param callback Callback interface to respond to.
+	 */
+	public RequestCreator callback(Callback callback, AdaptiveReference.Type type) {
+		this.data.callback(new AdaptiveReference<>(callback, type));
 		return this;
 	}
 
@@ -208,10 +194,26 @@ public class RequestCreator {
 	 * <p>
 	 * Be sure to add a callback to handle this.
 	 */
+	public void async(Callback callback) {
+		callback(callback).async();
+	}
+
+	/**
+	 * Executes request asynchronously.
+	 * <p>
+	 * Be sure to add a callback to handle this.
+	 */
+	public void async(Callback callback, AdaptiveReference.Type type) {
+		callback(callback, type).async();
+	}
+
+	/**
+	 * Executes request asynchronously.
+	 * <p>
+	 * Be sure to add a callback to handle this.
+	 */
 	public void async() {
 		final Request request = data.build();
-		final CallbackHandler handler = request.handler != null ? request.handler : singleton.handler;
-		final boolean safe = request.safe != null ? request.safe : singleton.safe;
 
 		// Ignore current request if already running (ignoreIfRunning)
 		synchronized (activeRequests) {
@@ -235,9 +237,17 @@ public class RequestCreator {
 					// Execute request
 					try {
 						singleton.load(request);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						singleton.log("Error executing request " + request.tag + " asynchronously! " + e.getMessage(), Log.ERROR);
-						handler.onLoadFailed(safe, request.callback.get());
+						PkRSS.handler.post(new Runnable() {
+							@Override
+							public void run() {
+								Callback callback = request.callback.get();
+								if (callback != null) {
+									callback.onLoaded(null, e);
+								}
+							}
+						});
 					}
 				} catch (InterruptedException e) {
 					singleton.log(request.tag + " thread interrupted!");

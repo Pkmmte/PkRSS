@@ -18,11 +18,9 @@ public final class Request {
 	public final boolean individual;
 	public final boolean skipCache;
 	public final int page;
-	public final Boolean safe;
-	public final CallbackHandler handler;
 	public final Downloader downloader;
 	public final Parser parser;
-	public final WeakReference<Callback> callback;
+	public final AdaptiveReference<Callback> callback;
 
 	/* Hidden constructor */
 	public Request(Builder builder) {
@@ -32,8 +30,6 @@ public final class Request {
 		this.individual = builder.individual;
 		this.skipCache = builder.skipCache;
 		this.page = builder.page;
-		this.safe = builder.safe;
-		this.handler = builder.handler;
 		this.downloader = builder.downloader;
 		this.parser = builder.parser;
 		this.callback = builder.callback;
@@ -46,11 +42,9 @@ public final class Request {
 		private boolean individual;
 		private boolean skipCache;
 		private int page;
-		private Boolean safe;
-		private CallbackHandler handler;
 		private Downloader downloader;
 		private Parser parser;
-		private WeakReference<Callback> callback;
+		private AdaptiveReference<Callback> callback;
 
 		public Builder(String url) {
 			this.tag = null;
@@ -59,8 +53,6 @@ public final class Request {
 			this.individual = false;
 			this.skipCache = false;
 			this.page = 1;
-			this.safe = null;
-			this.handler = null;
 			this.downloader = null;
 			this.parser = null;
 			this.callback = null;
@@ -96,16 +88,6 @@ public final class Request {
 			return this;
 		}
 
-		public Builder safe(boolean safe) {
-			this.safe = safe;
-			return this;
-		}
-
-		public Builder handler(CallbackHandler handler) {
-			this.handler = handler;
-			return this;
-		}
-
 		public Builder downloader(Downloader downloader) {
 			this.downloader = downloader;
 			return this;
@@ -116,8 +98,8 @@ public final class Request {
 			return this;
 		}
 
-		public Builder callback(Callback callback) {
-			this.callback = new WeakReference<>(callback);
+		public Builder callback(AdaptiveReference<Callback> callback) {
+			this.callback = callback;
 			return this;
 		}
 

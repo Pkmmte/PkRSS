@@ -38,10 +38,7 @@ public class PkRSS {
 	protected static final String TAG = "PkRSS";
 
 	// Callback Thread Handler
-	protected final CallbackHandler handler;
-
-	// Safely handle callbacks
-	protected final boolean safe;
+	static final Handler handler = new Handler(Looper.getMainLooper());
 
 	// For storing & reading read data
 	private final SharedPreferences mPrefs;
@@ -84,14 +81,12 @@ public class PkRSS {
 		PkRSS.singleton = singleton;
 	}
 
-	PkRSS(Context context, CallbackHandler handler, Downloader downloader, Parser parser, boolean loggingEnabled, boolean safe) {
-		this.handler = handler;
+	PkRSS(Context context, Downloader downloader, Parser parser, boolean loggingEnabled) {
 		this.downloader = downloader;
 		this.downloader.attachInstance(this);
 		this.parser = parser;
 		this.parser.attachInstance(this);
 		this.loggingEnabled = loggingEnabled;
-		this.safe = safe;
 		this.mPrefs = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
 		getRead();
 		favoriteDatabase = new FavoriteDatabase(context);
@@ -134,18 +129,12 @@ public class PkRSS {
 	 */
 	protected void load(final Request request) throws IOException {
 		log("load(" + request + ')');
-		final CallbackHandler handler = request.handler != null ? request.handler : this.handler;
-		final boolean safe = request.safe != null ? request.safe : this.safe;
-		Callback callback = request.callback != null ? request.callback.get() : null;
 
 		// Don't load if URL is the favorites key
 		if(request.url.equals(KEY_FAVORITES)) {
 			log("Favorites URL detected, skipping load...");
 			return;
 		}
-
-		// Notify callback
-		handler.onPreload(safe, callback);
 
 		// Create safe url for pagination/indexing purposes
 		String safeUrl = request.downloader == null ? downloader.toSafeUrl(request) : request.downloader.toSafeUrl(request);
@@ -157,11 +146,19 @@ public class PkRSS {
 		String response = request.downloader == null ? downloader.execute(request) : request.downloader.execute(request);
 
 		// Parse articles from response and inset into global list
-		List<RssItem> newItems = request.parser == null ? parser.parse(response) : request.parser.parse(response);
-		// TODO: insert(safeUrl, newArticles);
+		final List<RssItem> newItems = request.parser == null ? parser.parse(response) : request.parser.parse(response);
+		insert(safeUrl, newItems);
 
 		// Notify callback
-		handler.onLoaded(safe, callback, newItems);
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				Callback callback = request.callback != null ? request.callback.get() : null;
+				if (callback != null) {
+					callback.onLoaded(newItems, null);
+				}
+			}
+		});
 	}
 
 	/**
@@ -507,11 +504,9 @@ public class PkRSS {
 	/** Fluent API for creating {@link PkRSS} instances. */
 	public static class Builder {
 		private final Context context;
-		private CallbackHandler handler;
 		private Downloader downloader;
 		private Parser parser;
 		private boolean loggingEnabled;
-		private boolean safe;
 
 		/**
 		 * Start building a new {@link PkRSS} instance.
@@ -521,17 +516,6 @@ public class PkRSS {
 				throw new IllegalArgumentException("Context must not be null!");
 
 			this.context = context.getApplicationContext();
-			this.handler = new CallbackHandler(new Handler(Looper.getMainLooper()));
-		}
-
-		/**
-		 * Specifies the thread for which to execute callbacks on.
-		 * Setting this to null executes callbacks on the same thread in which the request was called. <br />
-		 * <b>Default: </b> new Handler(Lopper.getMainLooper())
-		 */
-		public Builder handler(Handler handler) {
-			this.handler = new CallbackHandler(handler);
-			return this;
 		}
 
 		/**
@@ -562,28 +546,18 @@ public class PkRSS {
 		}
 
 		/**
-		 * Toggle whether or not to automatically catch exceptions from callbacks.
-		 * <b>Default: </b> {@code false}
-		 */
-		public Builder safe(boolean safe) {
-			this.safe = safe;
-			return this;
-		}
-
-		/**
 		 * Creates a {@link PkRSS} instance.
 		 */
 		public PkRSS build() {
-			if(parser == null)
+			if(parser == null) {
 				parser = new Rss2Parser();
+			}
 
-			if(downloader == null)
+			if(downloader == null) {
 				downloader = Utils.createDefaultDownloader(context);
+			}
 
-			if(handler == null)
-				handler = new CallbackHandler();
-
-			return new PkRSS(context, handler, downloader, parser, loggingEnabled, safe);
+			return new PkRSS(context, downloader, parser, loggingEnabled);
 		}
 	}
 }
