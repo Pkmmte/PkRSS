@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 26
@@ -7,10 +8,11 @@ android {
 
     defaultConfig {
         applicationId "com.pkmmte.example"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+        vectorDrawables.useSupportLibrary true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -25,9 +27,13 @@ android {
 
 dependencies {
     compile project(":pkrss")
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.jakewharton.timber:timber:4.5.1'
+
+    final SUPPORT_LIBRARY_VERSION = '26.0.0-alpha1'
+    compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support:cardview-v7:$SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support:design:$SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support.constraint:constraint-layout:1.0.2"
+    compile "com.jakewharton.timber:timber:4.5.1"
 
     // Kotlin language
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version") {

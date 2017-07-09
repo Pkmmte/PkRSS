@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+	<!-- Branding -->
 	<color name="colorPrimary">#3F51B5</color>
 	<color name="colorPrimaryDark">#303F9F</color>
 	<color name="colorAccent">#FF4081</color>
+
+	<!-- Ripple Colors -->
+	<color name="ripple_dark">#42444444</color>
+	<color name="ripple_light">#42ffffff</color>
+	<color name="ripple_dark_weak">#20444444</color>
+	<color name="ripple_light_weak">#20ffffff</color>
+
+	<!-- Icon Colors -->
+	<color name="icon_active_dark">#89000000</color>
+	<color name="icon_disabled_dark">#60000000</color>
+	<color name="icon_active_light">#89ffffff</color>
+	<color name="icon_disabled_light">#60ffffff</color>
+
+	<!-- Text Colors -->
+	<color name="text_primary_dark">#dd000000</color>
+	<color name="text_secondary_dark">#89000000</color>
+	<color name="text_hint_dark">#60000000</color>
+	<color name="text_divider_dark">#1e000000</color>
+	<color name="text_primary_light">#ffffffff</color>
+	<color name="text_secondary_light">#b2ffffff</color>
+	<color name="text_hint_light">#4cffffff</color>
+	<color name="text_divider_light">#1effffff</color>
+
+	<!-- Misc -->
+	<color name="background_primary">#EEEEEE</color>
+	<color name="background_secondary">#EFEFEF</color>
+
 </resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<android.support.design.widget.CoordinatorLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
@@ -7,13 +7,82 @@
 	android:layout_height="match_parent"
 	tools:context="com.pkmmte.example.MainActivity">
 
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="Hello World!"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintLeft_toLeftOf="parent"
-		app:layout_constraintRight_toRightOf="parent"
-		app:layout_constraintTop_toTopOf="parent"/>
+	<android.support.design.widget.AppBarLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
 
-</android.support.constraint.ConstraintLayout>
+		<android.support.v7.widget.Toolbar
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:theme="@style/Theme.AppCompat"
+			app:contentInsetStart="24dp"
+			app:layout_scrollFlags="snap"
+			app:title="PkRSS Example"/>
+
+		<android.support.v7.widget.CardView
+			android:layout_width="match_parent"
+			android:layout_height="48dp"
+			android:layout_marginBottom="8dp"
+			android:layout_marginEnd="8dp"
+			android:layout_marginStart="8dp"
+			app:layout_scrollFlags="enterAlways">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<EditText
+					android:id="@+id/editUrl"
+					android:layout_width="0dp"
+					android:layout_height="match_parent"
+					android:layout_weight="1"
+					android:background="@null"
+					android:hint="@string/url_hint"
+					android:imeOptions="actionSearch"
+					android:inputType="textUri"
+					android:maxLines="1"
+					android:paddingEnd="16dp"
+					android:paddingStart="16dp"
+					android:text="@string/url_example"/>
+
+				<ImageView
+					android:id="@+id/btnSearch"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
+					android:layout_marginStart="8dp"
+					android:background="@color/colorAccent"
+					android:clickable="true"
+					android:contentDescription="@string/search"
+					android:foreground="@drawable/selector_dark_bounded"
+					android:scaleType="centerInside"
+					android:tint="@android:color/white"
+					app:srcCompat="@drawable/ic_search_black_24dp"/>
+			</LinearLayout>
+		</android.support.v7.widget.CardView>
+	</android.support.design.widget.AppBarLayout>
+
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/background_secondary"
+		app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+		<android.support.v4.widget.SwipeRefreshLayout
+			android:id="@+id/swipeLayout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/itemsList"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:clipChildren="false"
+				android:clipToPadding="false"
+				android:paddingBottom="12dp"
+				android:paddingTop="12dp"
+				android:scrollbarStyle="insideOverlay"
+				android:scrollbars="vertical"/>
+		</android.support.v4.widget.SwipeRefreshLayout>
+	</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>
