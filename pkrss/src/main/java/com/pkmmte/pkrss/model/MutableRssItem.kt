@@ -4,33 +4,34 @@ import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import java.io.Serializable
+import java.util.ArrayList
 
 /**
- * Created on June 29, 2017
+ * Created on July 7, 2017
  *
  * @author Pkmmte Xeleon
  */
-data class RssItem(
+data class MutableRssItem(
 		// Unique identifier
-		val id: Long,
+		var id: Long,
 
 		// Primary data
-		val title: String,
-		val image: Uri? = null,
-		val description: String? = null,
-		val date: Long? = 0,
-		val content: String? = null,
-		val author: String? = null,
+		var title: String,
+		var image: Uri? = null,
+		var description: String? = null,
+		var date: Long? = 0,
+		var content: String? = null,
+		var author: String? = null,
 
-        // Secondary data
-		val tags: List<String>? = ArrayList(),
-		val source: Uri? = null,
-		val mediaContent: List<MediaContent>? = null,
-		val enclosure: Enclosure? = null,
-		val comments: String? = null
+		// Secondary data
+		var tags: ArrayList<String>? = ArrayList(),
+		var source: Uri? = null,
+		var mediaContent: ArrayList<MediaContent>? = ArrayList(),
+		var enclosure: Enclosure? = null,
+		var comments: String? = null
 ) : Parcelable, Serializable {
-	fun mutate(): MutableRssItem {
-		return MutableRssItem(
+	fun immutable(): RssItem {
+		return RssItem(
 				id = id,
 				title = title,
 				image = image,
@@ -38,9 +39,9 @@ data class RssItem(
 				date = date,
 				content = content,
 				author = author,
-				tags = ArrayList(tags),
+				tags = tags,
 				source = source,
-				mediaContent = ArrayList(mediaContent),
+				mediaContent = mediaContent,
 				enclosure = enclosure,
 				comments = comments
 		)

@@ -10,6 +10,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Vector;
 
 public class MediaContent implements Parcelable, Serializable {
@@ -354,7 +355,7 @@ public class MediaContent implements Parcelable, Serializable {
 		}
 	};
 
-	public static Vector<MediaContent> fromByteArray(byte[] byteArray) {
+	public static List<MediaContent> fromByteArray(byte[] byteArray) {
 		try {
 			ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
 			ObjectInput in = new ObjectInputStream(bais);
@@ -372,7 +373,7 @@ public class MediaContent implements Parcelable, Serializable {
 		}
 	}
 
-	public static byte[] toByteArray(Vector<MediaContent> contentArray) {
+	public static byte[] toByteArray(List<MediaContent> contentArray) {
 		byte[] array = null;
 		try {
 			ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();

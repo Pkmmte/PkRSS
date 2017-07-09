@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import com.pkmmte.pkrss.downloader.Downloader;
-import com.pkmmte.pkrss.model.Article;
+import com.pkmmte.pkrss.model.RssItem;
 import com.pkmmte.pkrss.parser.Parser;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -178,7 +178,7 @@ public class RequestCreator {
 	 * contain only 1 index. It is recommended to use getFirst()
 	 * for individual requests instead.
 	 */
-	public List<Article> get() throws IOException {
+	public List<RssItem> get() throws IOException {
 		final Request request = data.build();
 		singleton.load(request);
 		return singleton.get(request.individual ? request.url + "feed/?withoutcomments=1" : request.url, request.search);
@@ -191,9 +191,9 @@ public class RequestCreator {
 	 * May return null.
 	 * @return Returns the first article associated with this request.
 	 */
-	public Article getFirst() {
+	public RssItem getFirst() {
 		try {
-			List<Article> articleList = get();
+			List<RssItem> articleList = get();
 			if(articleList == null || articleList.size() < 1)
 				return null;
 

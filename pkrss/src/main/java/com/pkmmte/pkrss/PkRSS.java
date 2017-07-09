@@ -11,7 +11,7 @@ import android.util.SparseBooleanArray;
 import com.pkmmte.pkrss.downloader.DefaultDownloader;
 import com.pkmmte.pkrss.downloader.Downloader;
 import com.pkmmte.pkrss.downloader.OkHttpDownloader;
-import com.pkmmte.pkrss.model.Article;
+import com.pkmmte.pkrss.model.RssItem;
 import com.pkmmte.pkrss.parser.Parser;
 import com.pkmmte.pkrss.parser.Rss2Parser;
 import java.io.IOException;
@@ -28,14 +28,6 @@ import java.util.Map;
  */
 public class PkRSS {
 	// General public constant keys
-	public static final String KEY_ARTICLE = "ARTICLE";
-	public static final String KEY_ARTICLE_ID = "ARTICLE ID";
-	public static final String KEY_ARTICLE_URL = "ARTICLE URL";
-	public static final String KEY_FEED_URL = "FEED URL";
-	public static final String KEY_CATEGORY_NAME = "CATEGORY NAME";
-	public static final String KEY_CATEGORY = "CATEGORY";
-	public static final String KEY_SEARCH = "SEARCH TERM";
-	public static final String KEY_READ_ARRAY = "READ ARRAY";
 	public static final String KEY_FAVORITES = "FAVORITES";
 
 	// Global singleton instance
@@ -60,8 +52,8 @@ public class PkRSS {
 	// Reusable XML Parser
 	private final Parser parser;
 
-	// List of stored articles
-	private final Map<String, List<Article>> articleMap = new HashMap<String, List<Article>>();
+	// List of stored items
+	private final Map<String, List<RssItem>> itemMap = new HashMap<>();
 
 	// Keep track of pages already loaded on specific feeds
 	private final Map<String, Integer> pageTracker = new HashMap<String, Integer>();
@@ -165,20 +157,20 @@ public class PkRSS {
 		String response = request.downloader == null ? downloader.execute(request) : request.downloader.execute(request);
 
 		// Parse articles from response and inset into global list
-		List<Article> newArticles = request.parser == null ? parser.parse(response) : request.parser.parse(response);
-		insert(safeUrl, newArticles);
+		List<RssItem> newItems = request.parser == null ? parser.parse(response) : request.parser.parse(response);
+		// TODO: insert(safeUrl, newArticles);
 
 		// Notify callback
-		handler.onLoaded(safe, callback, newArticles);
+		handler.onLoaded(safe, callback, newItems);
 	}
 
 	/**
-	 * Returns a {@link HashMap<String, List<Article>} containing all loaded
-	 * Article objects. The map key being the safe url.
+	 * Returns a {@link HashMap<String, List<RssItem>} containing all loaded
+	 * RSS items. The map key being the safe url.
 	 * @return
 	 */
-	public Map<String, List<Article>> get() {
-		return articleMap;
+	public Map<String, List<RssItem>> get() {
+		return itemMap;
 	}
 
 	/**
@@ -187,11 +179,11 @@ public class PkRSS {
 	 * @return A {@link List} containing all loaded articles associated with that
 	 * URL. May be null if no such URL has yet been loaded.
 	 */
-	public List<Article> get(String url) {
+	public List<RssItem> get(String url) {
 		if(url.equals(KEY_FAVORITES))
 			return getFavorites();
 
-		return articleMap.get(url);
+		return itemMap.get(url);
 	}
 
 	/**
@@ -201,25 +193,25 @@ public class PkRSS {
 	 * @return A {@link List} containing all loaded articles associated with that
 	 * URL and query. May be null if no such URL has yet been loaded.
 	 */
-	public List<Article> get(String url, String search) {
+	public List<RssItem> get(String url, String search) {
 		if(search == null)
-			return articleMap.get(url);
+			return itemMap.get(url);
 
-		return articleMap.get(url + "?s=" + Uri.encode(search));
+		return itemMap.get(url + "?s=" + Uri.encode(search));
 	}
 
 	/**
-	 * Returns an {@link Article} object associated with the specified id.
+	 * Returns an {@link RssItem} object associated with the specified id.
 	 * @param id ID belonging to such article.
 	 * @return The Article associated with the specified id. May return null if
 	 * no such article was found with that ID.
 	 */
-	public Article get(int id) {
+	public RssItem get(int id) {
 		long time = System.currentTimeMillis();
 
 		// Look for an article with this id in the Article HashMap
-		for(List<Article> articleList : articleMap.values()) {
-			for(Article article : articleList) {
+		for(List<RssItem> articleList : itemMap.values()) {
+			for(RssItem article : articleList) {
 				if(article.getId() == id) {
 					log("get(" + id + ") took " + (System.currentTimeMillis() - time) + "ms");
 					return article;
@@ -228,10 +220,10 @@ public class PkRSS {
 		}
 
 		// If none was found, try searching in the favorites database
-		for(Article article : favoriteDatabase.getAll()) {
-			if(article.getId() == id) {
+		for(RssItem item : favoriteDatabase.getAll()) {
+			if(item.getId() == id) {
 				log("get(" + id + ") took " + (System.currentTimeMillis() - time) + "ms");
-				return article;
+				return item;
 			}
 		}
 
@@ -244,7 +236,7 @@ public class PkRSS {
 	 * Retrieves an ArrayList of articles from the Favorite Database.
 	 * @return Either an Article List or null if database wasn't properly started.
 	 */
-	public List<Article> getFavorites() {
+	public List<RssItem> getFavorites() {
 		return favoriteDatabase == null ? null : favoriteDatabase.getAll();
 	}
 
@@ -266,14 +258,14 @@ public class PkRSS {
 		}
 
 		// Look for an article with this id in the Article HashMap
-		for(List<Article> articleList : articleMap.values()) {
-			for(Article article : articleList)
-				readList.put(article.getId(), read);
+		for(List<RssItem> itemList : itemMap.values()) {
+			for(RssItem item : itemList)
+				readList.put((int) item.getId(), read);
 		}
 
 		// If none was found, try searching in the favorites database
-		for(Article article : favoriteDatabase.getAll()) {
-			readList.put(article.getId(), read);
+		for(RssItem item : favoriteDatabase.getAll()) {
+			readList.put((int) item.getId(), read);
 		}
 
 		writeRead();
@@ -300,7 +292,7 @@ public class PkRSS {
 	}
 
 	/**
-	 * Saves an {@link Article} object to the favorites database.
+	 * Saves an {@link RssItem} object to the favorites database.
 	 * <p>
 	 * If possible, use the Article object itself instead to increase performance!
 	 * @param id ID of the article to save.
@@ -311,7 +303,7 @@ public class PkRSS {
 	}
 
 	/**
-	 * Saves/Deletes an {@link Article} object to the favorites database.
+	 * Saves/Deletes an {@link RssItem} object to the favorites database.
 	 * <p>
 	 * If possible, use the Article object itself instead to increase performance!
 	 * @param id ID of the article to save.
@@ -323,34 +315,34 @@ public class PkRSS {
 	}
 
 	/**
-	 * Saves an {@link Article} object to the favorites database.
-	 * @param article Article object to save.
+	 * Saves an {@link RssItem} object to the favorites database.
+	 * @param item RssItem object to save.
 	 * @return {@code true} if successful, {@code false} if otherwise.
 	 */
-	public boolean saveFavorite(Article article) {
-		return saveFavorite(article, true);
+	public boolean saveFavorite(RssItem item) {
+		return saveFavorite(item, true);
 	}
 
 	/**
-	 * Saves/Deletes an {@link Article} object to the favorites database.
-	 * @param article Article object to save.
+	 * Saves/Deletes an {@link RssItem} object to the favorites database.
+	 * @param item RssItem object to save.
 	 * @param favorite Whether to save or delete. {@code true} to save; {@code false} to delete.
 	 * @return {@code true} if successful, {@code false} if otherwise.
 	 */
-	public boolean saveFavorite(Article article, boolean favorite) {
+	public boolean saveFavorite(RssItem item, boolean favorite) {
 		long time = System.currentTimeMillis();
-		log("Adding article " + article.getId() + " to favorites...");
+		log("Adding article " + item.getId() + " to favorites...");
 		try {
 			if (favorite)
-				favoriteDatabase.add(article);
+				favoriteDatabase.add(item);
 			else
-				favoriteDatabase.delete(article);
+				favoriteDatabase.delete(item);
 		}
 		catch (Exception e) {
 			log("Error " + (favorite ? "saving article to" : "deleting article from") + " favorites database.", Log.ERROR);
 		}
 
-		log("Saving article " + article.getId() + " to favorites took " + (System.currentTimeMillis() - time) + "ms");
+		log("Saving article " + item.getId() + " to favorites took " + (System.currentTimeMillis() - time) + "ms");
 		return true;
 	}
 
@@ -409,14 +401,14 @@ public class PkRSS {
 	 * Inserts the passed list into the article map database.
 	 * This will be cleared once the instance dies.
 	 * @param url URL to associate this list with.
-	 * @param newArticles Article list to store.
+	 * @param newItems Article list to store.
 	 */
-	private void insert(String url, List<Article> newArticles) {
-		if(!articleMap.containsKey(url))
-			articleMap.put(url, new ArrayList<Article>());
+	private void insert(String url, List<RssItem> newItems) {
+		if(!itemMap.containsKey(url))
+			itemMap.put(url, new ArrayList<RssItem>());
 
-		List<Article> articleList = articleMap.get(url);
-		articleList.addAll(newArticles);
+		List<RssItem> articleList = itemMap.get(url);
+		articleList.addAll(newItems);
 
 		log("New size for " + url + " is " + articleList.size());
 	}

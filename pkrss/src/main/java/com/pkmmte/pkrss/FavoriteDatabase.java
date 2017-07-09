@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.pkmmte.pkrss.model.Article;
+import com.pkmmte.pkrss.model.RssItem;
 import com.pkmmte.pkrss.model.MediaContent;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 	// Basic Database Info
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "db.pkrss.favorites";
-	private static final String TABLE_ARTICLES = "articles";
+	private static final String TABLE_ITEMS = "items";
 
 	// Column Keys
 	private static final String KEY_TAGS = "TAGS";
@@ -45,7 +45,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_ARTICLES_TABLE = "CREATE TABLE "
-			+ TABLE_ARTICLES
+			+ TABLE_ITEMS
 			+ " ( "
 			+ KEY_TAGS
 			+ " TEXT , "
@@ -75,35 +75,35 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ARTICLES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
 		onCreate(db);
 	}
 
 	/**
 	 * Inserts an Article object to this database.
 	 *
-	 * @param article Object to save into database.
+	 * @param item Object to save into database.
 	 */
-	public void add(Article article) {
+	public void add(RssItem item) {
 		// Get Write Access
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		// Build Content Values
 		ContentValues values = new ContentValues();
-		values.put(KEY_TAGS, TextUtils.join("_PCX_", article.getTags()));
-		values.put(KEY_MEDIA_CONTENT, MediaContent.toByteArray(article.getMediaContent()));
-		values.put(KEY_SOURCE, article.getSource().toString());
-		values.put(KEY_IMAGE, article.getImage().toString());
-		values.put(KEY_TITLE, article.getTitle());
-		values.put(KEY_DESCRIPTION, article.getDescription());
-		values.put(KEY_CONTENT, article.getContent());
-		values.put(KEY_COMMENTS, article.getComments());
-		values.put(KEY_AUTHOR, article.getAuthor());
-		values.put(KEY_DATE, article.getDate());
-		values.put(KEY_ID, article.getId());
+		values.put(KEY_TAGS, TextUtils.join("_PCX_", item.getTags()));
+		values.put(KEY_MEDIA_CONTENT, MediaContent.toByteArray(item.getMediaContent()));
+		values.put(KEY_SOURCE, item.getSource().toString());
+		values.put(KEY_IMAGE, item.getImage().toString());
+		values.put(KEY_TITLE, item.getTitle());
+		values.put(KEY_DESCRIPTION, item.getDescription());
+		values.put(KEY_CONTENT, item.getContent());
+		values.put(KEY_COMMENTS, item.getComments());
+		values.put(KEY_AUTHOR, item.getAuthor());
+		values.put(KEY_DATE, item.getDate());
+		values.put(KEY_ID, item.getId());
 
 		// Insert & Close
-		db.insert(TABLE_ARTICLES, null, values);
+		db.insert(TABLE_ITEMS, null, values);
 		db.close();
 	}
 
@@ -111,23 +111,23 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 	 * @param id ID to search for.
 	 * @return An Article object with the specified ID. May return null if none was found.
 	 */
-	public Article get(int id) {
+	public RssItem get(int id) {
 		// Get Read Access
 		SQLiteDatabase db = this.getReadableDatabase();
 
 		// Execute query with specified id
-		Cursor cursor = db.query(TABLE_ARTICLES,
+		Cursor cursor = db.query(TABLE_ITEMS,
 		                         new String[] {KEY_TAGS, KEY_MEDIA_CONTENT, KEY_SOURCE, KEY_IMAGE, KEY_TITLE, KEY_DESCRIPTION, KEY_CONTENT, KEY_COMMENTS, KEY_AUTHOR,
 			                         KEY_DATE, KEY_ID}, KEY_ID + "=?", new String[] {String.valueOf(id)}, null, null, null, null);
-		Article article = null;
+		RssItem item = null;
 
 		try {
 			// Attempt to retrieve article
 			if (cursor != null) {
 				cursor.moveToFirst();
-				article = new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), MediaContent.fromByteArray(cursor.getBlob(1)), Uri.parse(cursor.getString(2)),
-				                      Uri.parse(cursor.getString(3)), cursor.getString(4), cursor.getString(5), cursor.getString(6),
-				                      cursor.getString(7), cursor.getString(8), cursor.getLong(9), cursor.getInt(10));
+				item = new RssItem(cursor.getLong(10), cursor.getString(4), Uri.parse(cursor.getString(3)), cursor.getString(5), cursor.getLong(9), cursor.getString(6),
+						cursor.getString(8), Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(2)),
+						MediaContent.fromByteArray(cursor.getBlob(1)), null, cursor.getString(7));
 			}
 		} finally {
 			// Close Cursor
@@ -136,16 +136,16 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 
 		// Close & Return
 		db.close();
-		return article;
+		return item;
 	}
 
 	/**
 	 * @return A backwards Article ArrayList ordered from last added to end.
 	 */
-	public List<Article> getAll() {
+	public List<RssItem> getAll() {
 		// Init List & Build Query
-		List<Article> articleList = new ArrayList<Article>();
-		String selectQuery = "SELECT  * FROM " + TABLE_ARTICLES;
+		List<RssItem> articleList = new ArrayList<>();
+		String selectQuery = "SELECT  * FROM " + TABLE_ITEMS;
 
 		// Get Write Access & Execute Query
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -154,9 +154,9 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 		// Read the query backwards
 		if (cursor.moveToLast()) {
 			do {
-				articleList.add(new Article(null, Arrays.asList(cursor.getString(0).split("_PCX_")), MediaContent.fromByteArray(cursor.getBlob(1)), Uri.parse(cursor.getString(2)),
-				                            Uri.parse(cursor.getString(3)), cursor.getString(4), cursor.getString(5), cursor.getString(6),
-				                            cursor.getString(7), cursor.getString(8), cursor.getLong(9), cursor.getInt(10)));
+				articleList.add(new RssItem(cursor.getLong(10), cursor.getString(4), Uri.parse(cursor.getString(3)), cursor.getString(5), cursor.getLong(9), cursor.getString(6),
+								cursor.getString(8), Arrays.asList(cursor.getString(0).split("_PCX_")), Uri.parse(cursor.getString(2)),
+								MediaContent.fromByteArray(cursor.getBlob(1)), null, cursor.getString(7)));
 			} while (cursor.moveToPrevious());
 		}
 		cursor.close();
@@ -172,7 +172,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 	public boolean contains(int id) {
 		// Get Read Access & Execute Query
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_ARTICLES,
+		Cursor cursor = db.query(TABLE_ITEMS,
 		                         new String[] {KEY_TAGS, KEY_MEDIA_CONTENT, KEY_SOURCE, KEY_IMAGE, KEY_TITLE, KEY_DESCRIPTION, KEY_CONTENT, KEY_COMMENTS, KEY_AUTHOR,
 			                         KEY_DATE, KEY_ID}, KEY_ID + "=?", new String[] {String.valueOf(id)}, null, null, null, null);
 
@@ -187,11 +187,11 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 
 	/**
 	 * Removes a specified Article from this database based on its ID value.
-	 * @param article Article to remove. May contain dummy data as long as the id is valid.
+	 * @param item Article to remove. May contain dummy data as long as the id is valid.
 	 */
-	public void delete(Article article) {
+	public void delete(RssItem item) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_ARTICLES, KEY_ID + " = ?", new String[] {String.valueOf(article.getId())});
+		db.delete(TABLE_ITEMS, KEY_ID + " = ?", new String[] {String.valueOf(item.getId())});
 		db.close();
 	}
 
@@ -200,7 +200,7 @@ class FavoriteDatabase extends SQLiteOpenHelper {
 	 */
 	public void deleteAll() {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_ARTICLES, null, null);
+		db.delete(TABLE_ITEMS, null, null);
 		db.close();
 	}
 }

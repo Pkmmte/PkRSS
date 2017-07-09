@@ -2,7 +2,7 @@ package com.pkmmte.pkrss;
 
 import android.os.Handler;
 
-import com.pkmmte.pkrss.model.Article;
+import com.pkmmte.pkrss.model.RssItem;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -29,9 +29,9 @@ class CallbackHandler {
 		invokeCallback(method, callback, safe);
 	}
 
-	protected void onLoaded(final boolean safe, final Callback callback, final List<Article> newArticles) {
+	protected void onLoaded(final boolean safe, final Callback callback, final List<RssItem> newItems) {
 		Method method = getDeclaredMethod(clazz, "onLoaded", List.class);
-		invokeCallback(method, callback, safe, newArticles);
+		invokeCallback(method, callback, safe, newItems);
 	}
 
 	protected void onLoadFailed(boolean safe, Callback callback) {
